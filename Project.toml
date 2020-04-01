@@ -1,0 +1,4 @@
+name = "QuEST"
+uuid = "2459ce63-a949-4045-b34d-4c0e485dd26d"
+authors = ["dojt <dotheis.work@gmail.com>"]
+version = "0.1.0"
