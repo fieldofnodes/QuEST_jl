@@ -22,6 +22,7 @@ do_work()
 {
      fprintf(outf,
              "module QuEST_h\n");
+     fprintf(outf,"export ComplexArray, PAULI_I, PAULI_X, PAULI_Y, PAULI_Z, Complex, ComplexMatrix2, ComplexMatrix4, ComplexMatrixN, Vector, Qureg, QuESTEnv\n");
      fprintf(outf,
              "struct ComplexArray\n"
              "  real ::Ptr{%s}\n"
@@ -72,7 +73,7 @@ do_work()
 
      fprintf(outf,
              "primitive type Qureg %lu end\n",
-             sizeof(struct Qureg));
+             8*sizeof(struct Qureg));                    // number of 𝙗𝙞𝙩𝙨
      ;                                                   _Static_assert(_Alignof(struct Qureg)==8,
                                                                         "Weird alignment of struct Qureg\n");
 
