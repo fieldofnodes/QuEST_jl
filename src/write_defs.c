@@ -1,12 +1,14 @@
 #include <QuEST.h>
 
+extern
+int  getQuEST_PREC(void);          // undocumented function in "QuEST.c"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
 const
-char outfilename[] = "";
+char outfilename[] = "QuEST_h.jl";
 
 
 FILE * outf;
@@ -88,36 +90,27 @@ do_work()
      return 0;
 } //^ do_work()
 
-int main(int const argc, char const * argv[const])
+int main(int const    argc,
+         char const * argv[const])
 {
-     char * pchr;
-
-     ;                                                      if (argc != 2)
+     ;                                                      if (argc != 1)
                                                                  return fprintf(stderr,
-                                                                                        "Give the size of the `qreal` type "
-                                                                                        "that QuEST is compiled with ('4', or '8').\n"),
+                                                                                "Doof use.\n"),
                                                                       1;
 
-     long const
-          l_sizeof_qreal = strtol(argv[1],&pchr,10);
-
-     ;                                                      if (*pchr)
+     const size_t
+          l_sizeof_qreal = 4*getQuEST_PREC();
+     ;                                                      if (l_sizeof_qreal!=4 && l_sizeof_qreal!=8)
                                                                  return fprintf(stderr,
-                                                                                      "Unable to read integer argument.\n"),
+                                                                                "libQuEST reports size of qreal no int {4,8}.\n"),
                                                                       1;
-     ;                                                      if (l_sizeof_qreal<0
-                                                                || l_sizeof_qreal > 100
-                                                                || l_sizeof_qreal != sizeof(qreal) )
+     ;                                                      if ( l_sizeof_qreal != sizeof(qreal) )
                                                                  return fprintf(stderr,
-                                                                                "Size of libQuEST-qreal type doesn't match my setting.\n"),
+                                                                                "Size of libQuEST-qreal type doesn't match this compilation setting.\n"),
                                                                       1;
 
      sizeof_qreal = (unsigned)l_sizeof_qreal;
-     ;                                                      if (sizeof_qreal!=4 && sizeof_qreal!=8)
-                                                                 return fprintf(stderr,
-                                                                                "Sorry, I can only do sizeof(qreal) ∈ {4,8}\n"),
-                                                                      1;
-     outf = fopen(outfilename,"w");
+     outf         = fopen(outfilename,"w");
      ;                                                      if (!outf)
                                                                  return fprintf(stderr, "Failed to open file %s for writing.\n", outfilename),
                                                                       1;
@@ -131,5 +124,6 @@ int main(int const argc, char const * argv[const])
                                                                       1;
      if ( fclose(outf) )                                    return fprintf(stderr, "Closing file %s after writing failed.\n",outfilename),
                                                                  1;
+     printf("%s: Done.\n", argv[0]);
      return 0;
 } //^ main()
