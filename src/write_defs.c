@@ -14,7 +14,7 @@ char outfilename[] = "QuEST_h.jl";
 FILE * outf;
 unsigned sizeof_qreal;
 
-#define FPTYPE (  sizeof_qreal==4 ? "Float32" : "Float64"  )
+#define FPTYPE (  sizeof_qreal==4 ? "Cfloat" : "Cdouble"  )
 
 static
 int                // RET 0 iff successful
@@ -22,7 +22,8 @@ do_work()
 {
      fprintf(outf,
              "module QuEST_h\n");
-     fprintf(outf,"export ComplexArray, PAULI_I, PAULI_X, PAULI_Y, PAULI_Z, Complex, ComplexMatrix2, ComplexMatrix4, ComplexMatrixN, Vector, Qureg, QuESTEnv\n");
+     fprintf(outf,"export Qreal, ComplexArray, PAULI_I, PAULI_X, PAULI_Y, PAULI_Z, Complex, ComplexMatrix2, ComplexMatrix4, ComplexMatrixN, Vector, Qureg, QuESTEnv\n");
+     fprintf(outf,"const Qreal = %s",FPTYPE);
      fprintf(outf,
              "struct ComplexArray\n"
              "  real ::Ptr{%s}\n"
@@ -30,10 +31,10 @@ do_work()
              "end\n",
              FPTYPE, FPTYPE);
      fprintf(outf,
-             "const PAULI_I=Int32(0)\n"
-             "const PAULI_X=Int32(1)\n"
-             "const PAULI_Y=Int32(2)\n"
-             "const PAULI_Z=Int32(3)\n"
+             "const PAULI_I=Cint(0)\n"
+             "const PAULI_X=Cint(1)\n"
+             "const PAULI_Y=Cint(2)\n"
+             "const PAULI_Z=Cint(3)\n"
           );
 
      fprintf(outf,
@@ -57,7 +58,7 @@ do_work()
              FPTYPE, FPTYPE);
      fprintf(outf,
              "struct ComplexMatrixN\n"
-             "  numQubits ::Int32\n"
+             "  numQubits ::Cint\n"
              "  real      ::Ptr{Ptr{%s}}\n"
              "  imag      ::Ptr{Ptr{%s}}\n"
              "end\n",
@@ -79,8 +80,8 @@ do_work()
 
      fprintf(outf,
              "struct QuESTEnv\n"
-             "  rank     ::Int32\n"
-             "  numRanks ::Int32\n"
+             "  rank     ::Cint\n"
+             "  numRanks ::Cint\n"
              "end\n");
 
      fprintf(outf,
