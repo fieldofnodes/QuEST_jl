@@ -1,4 +1,4 @@
-#include <QuEST.h>
+#include "QuEST.h"
 
 extern
 int  getQuEST_PREC(void);          // undocumented function in "QuEST.c"
