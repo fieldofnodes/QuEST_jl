@@ -7,7 +7,6 @@ function test_env()
     env = QuEST.createQuESTEnv()
     test_qureg(env)
     test_densiQureg(env)
-    QuEST.syncQuESTEnv(env)
     QuEST.destroyQuESTEnv(env)
 end
 
