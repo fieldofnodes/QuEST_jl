@@ -24,6 +24,31 @@ function destroyQuESTEnv(env ::QuESTEnv) ::Nothing
     return nothing
 end
 
+function reportQuESTEnv(env ::QuESTEnv) ::Nothing
+    ccall(:reportQuESTEnv, Cvoid, (QuESTEnv,),
+          env)
+    return nothing
+end
+
+function getEnvironmentString(env ::QuESTEnv, qureg ::Qureg) ::String
+    cstr = Vector{Cchar}(undef,232)
+    ccall(:getEnvironmentString, Cvoid, (QuESTEnv, Qureg, Ptr{Cchar}),
+          env, qureg, cstr)
+    return unsafe_string(pointer(cstr))
+end
+
+function copyStateToGPU(qureg ::Qureg) ::Nothing
+    ccall(:copyStateToGPU, Cvoid, (Qureg,),
+          qureg)
+    return nothing
+end
+
+function copyStateFromGPU(qureg ::Qureg) ::Nothing
+    ccall(:copyStateFromGPU, Cvoid, (Qureg,),
+          qureg)
+    return nothing
+end
+
 # function syncQuESTEnv(env ::QuESTEnv) ::Nothing
 #     ccall(:syncQuESTEnv, Cvoid, (QuESTEnv,),
 #           env)
@@ -194,6 +219,10 @@ function cloneQureg(targetQureg ::Qureg, copyQureg ::Qureg) ::Nothing
     return nothing
 end
 
+#
+# 5. Gates
+#
+
 function phaseShift(qureg       ::Qureg,
                     targetQubit ::Int,
                     angle       ::Qreal) ::Nothing
@@ -244,14 +273,14 @@ function tGate(qureg ::Qureg, targetQubit ::Int) ::Nothing
     return nothing
 end
 
-function reportQuESTEnv(env ::QuESTEnv) ::Nothing
-    ccall(:reportQuESTEnv, Cvoid, (QuESTEnv,),
-          env)
-    return nothing
+#
+# 6. Query state
+#
+
+function getAmp(qureg ::Qureg,  idx ::Int) ::Complex{Float64}
+    QuE Complex ccall(:getAmp, Complex, (Qureg, Clonglong),
+          qureg, idx)
 end
-
-
-
 
 
 ## Init #-----------------------------------------------------------------------
