@@ -23,7 +23,7 @@ do_work()
      fprintf(outf,
              "module QuEST_h\n");
      fprintf(outf,"export Qreal, ComplexArray, PAULI_I, PAULI_X, PAULI_Y, PAULI_Z, Complex, ComplexMatrix2, ComplexMatrix4, ComplexMatrixN, Vector, Qureg, QuESTEnv\n");
-     fprintf(outf,"const Qreal = %s",FPTYPE);
+     fprintf(outf,"const Qreal = %s\n",FPTYPE);
      fprintf(outf,
              "struct ComplexArray\n"
              "  real ::Ptr{%s}\n"
