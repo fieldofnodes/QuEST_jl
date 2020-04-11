@@ -62,6 +62,8 @@ end
 #    1. Create & destroy
 #    2. Complex N-matrix
 #    3. Report & get
+#    4. Init
+#    5. Query
 #
 #-------------------------------------------------------------------------------
 
@@ -156,7 +158,7 @@ end
 
 
 #
-# 4. Init state
+# 5. Init state
 #
 
 function initBlankState(qureg ::Qureg) ::Nothing
@@ -220,7 +222,47 @@ function cloneQureg(targetQureg ::Qureg, copyQureg ::Qureg) ::Nothing
 end
 
 #
-# 5. Gates
+# 7. Query state
+#
+
+
+function getAmp(qureg ::Qureg,  idx ::Int) ::Complex{Qreal}
+    α = ccall(:getAmp, QuEST_h.Complex, (Qureg, Clonglong),
+               qureg, idx)
+    return Complex{Qreal}(α.real,α.imag)
+end
+
+function getProbAmp(qureg ::Qureg, idx ::Int) :: Qreal
+    ccall(:getProbAmp, Qreal, (Qureg, Clonglong),
+               qureg, idx)
+    return p
+end
+
+function getDensityAmp(qureg ::Qureg, row ::Int, col ::Int) ::Complex{Qreal}
+    α = ccall(:getDensityAmp, QuEST_h.Complex, (Qureg, Clonglong, Clonglong),
+              qureg, row, col)
+    return Complex{Qreal}(α.real, α.imag)
+end
+
+function calcTotalProb(qureg ::Qureg) ::Float64
+    one = ccall(:calcTotalProb, Qreal, (Qureg,),
+                qureg)
+    return one
+end
+
+
+## Apply operation #------------------------------------------------------------
+#
+# Apply quantum operation
+#
+#    1. Gates
+#    2. Unitary matrices
+#
+#
+#-------------------------------------------------------------------------------
+
+#
+# 1. Gates
 #
 
 function phaseShift(qureg       ::Qureg,
@@ -273,13 +315,34 @@ function tGate(qureg ::Qureg, targetQubit ::Int) ::Nothing
     return nothing
 end
 
+
 #
-# 6. Query state
+# 2. Apply unitary matrices
 #
 
-function getAmp(qureg ::Qureg,  idx ::Int) ::Complex{Float64}
-    QuE Complex ccall(:getAmp, Complex, (Qureg, Clonglong),
-          qureg, idx)
+function compactUnitary(qureg       ::Qureg,
+                        targetQubit ::Int,
+                        α           ::Complex{Qreal},
+                        β           ::Complex{Qreal})   ::Nothing
+    alpha = QuEST_h.Complex(real(α),imag(α))
+    beta  = QuEST_h.Complex(real(β),imag(β))
+
+    ccall(:compactUnitary, Cvoid, (Qureg, Cint, QuEST_h.Complex, QuEST_h.Complex),
+          qureg, targetQubit, alpha, beta)
+
+    return nothing
+end
+
+function unitary(qureg           ::Qureg,
+                 targetQubit     ::Int,
+                 U               ::Array{Qreal,2}) ::Nothing
+    @assert size(U) == (2,2)
+    u = ComplexMatrix2(
+        ( (real(u[1,1]), real(u[1,2])), (real(u[2,1]), real(u[2,2])) ),
+        ( (imag(u[1,1]), imag(u[1,2])), (imag(u[2,1]), imag(u[2,2])) )  )
+    void unitary(Qureg qureg, const int targetQubit, ComplexMatrix2 u),
+    )
+    return nothing
 end
 
 
