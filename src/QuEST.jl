@@ -110,6 +110,7 @@ end
 #    3. Report & get
 #    4. Init
 #    5. Query
+#    6. Measure Copenhagen
 #
 #-------------------------------------------------------------------------------
 
@@ -204,7 +205,7 @@ end
 
 
 #
-# 5. Init state
+# 4. Init state
 #
 
 function initBlankState(qureg ::Qureg) ::Nothing
@@ -268,9 +269,8 @@ function cloneQureg(targetQureg ::Qureg, copyQureg ::Qureg) ::Nothing
 end
 
 #
-# 7. Query state
+# 5. Query state
 #
-
 
 function getAmp(qureg ::Qureg,  idx ::Int) ::Complex{Qreal}
     α = ccall(:getAmp, QuEST_h.Complex, (Qureg, Clonglong),
@@ -304,6 +304,44 @@ function calcProbOfOutcome(qureg        ::Qureg,
     return p
 end
 
+function calcExpecPauliProd(qureg        ::Qureg,
+                            targetQubits ::Vector{Int32}
+                            pauliCodes   ::Vector{Int32},
+                            workspace    ::Qureg)          ::Float64
+    ccall(:calcExpecPauliProd, Qreal, (Qureg, Ptr{Cint}, Ptr{Cint}, Cint, Qureg),
+          qureg, targetQubits, pauliCodes, length(targetQubits),  workspace)
+    return nothing
+end
+
+
+function calcInnerProduct(bra ::Qureg, ket ::Qureg) ::Complex{Float64}
+    w = ccall(:calcInnerProduct, QuEST_h.Complex, (Qureg, Qureg),
+          bra, ket)
+    return Complex{Float64}(w.real,w.imag)
+end
+
+function calcDensityInnerProduct(ϱ1 ::Qureg, ϱ2 ::Qureg) ::Float64
+    w = ccall(:calcDensityInnerProduct, Qreal, (Qureg, Qureg),
+              ϱ1, ϱ2)
+    return Float64(w)
+end
+
+function calcPurity(qureg ::Qureg) ::Float64
+    pu = ccall(:calcPurity, Qreal, (Qureg,),
+               qureg)
+    return pu
+end
+
+function calcFidelity(qureg ::Qureg, pureState ::Qureg) ::Float64
+    fi = ccall(:calcFidelity, Qreal, (Qureg, Qureg),
+               qureg, pureState)
+    return fi
+end
+
+#
+# 6. Copenhagen measure
+#
+
 function  collapseToOutcome(qureg        ::Qureg,
                             measureQubit ::Int,
                             outcome      ::Int)   ::Float64
@@ -324,18 +362,6 @@ function measureWithStats(qureg        ::Qureg,
     i = ccall(:measureWithStats, Cint, (Qureg, Cint, Ref{Qreal}),
           qureg, measureQubit, p)
     return (Int(i),Float64(p))
-end
-
-function calcInnerProduct(bra ::Qureg, ket ::Qureg) ::Complex{Float64}
-    w = ccall(:calcInnerProduct, QuEST_h.Complex, (Qureg, Qureg),
-          bra, ket)
-    return Complex{Float64}(w.real,w.imag)
-end
-
-function calcDensityInnerProduct(ϱ1 ::Qureg, ϱ2 ::Qureg) ::Float64
-    w = ccall(:calcDensityInnerProduct, Qreal, (Qureg, Qureg),
-              ϱ1, ϱ2)
-    return Float64(w)
 end
 
 ## Apply operation #------------------------------------------------------------
@@ -497,6 +523,25 @@ function controlledRotateZ(qureg         ::Qureg,
     return nohting
 end
 
+function multiRotateZ(qureg      ::Qureg,
+                      qubits     ::Vector{Int32},
+                      angle      ::Qreal)         ::Nothing
+    ccall(:multiRotateZ, Cvoid, (Qureg, Ptr{int}, Cint, Qreal),
+          qureg, qubits, length(qubits), angle)
+    return nothing
+end
+
+function multiRotatePauli(qureg         ::Qureg,
+                          targetQubits  ::Vector{Int32},
+                          targetPaulis  ::Vector{Int32},
+                          angle         ::Qreal)          ::Nothing
+    @assert length(targetQubits) == length(targetPaulis)
+    @assert all( i -> 0 ≤ targetPaulis[i] ≤ 3,      1:length(targetPaulis) )
+    ccall(:multiRotatePauli, Cvoid, (Qureg, Ptr{Cint}, Ptr{Cint}, Cint, Qreal),
+          qureg, targetQubits, targetPaulis, length(targetPaulis), angle)
+    return nothing
+end
+
 function controlledRotateAroundAxis(qureg        ::Qureg,
                                     controlQubit ::Int,
                                     targetQubit  ::Int,
@@ -504,6 +549,19 @@ function controlledRotateAroundAxis(qureg        ::Qureg,
                                     axis         ::Vector)  ::Nothing
     ccall(:controlledRotateAroundAxis, Cvoid, (Qureg, Cint, Cint, Qreal, Vector),
           qureg, controlQubit, targetQubit, angle, axis)
+    return nothing
+end
+
+
+function swapGate(qureg ::Qureg, qubit1 ::Int, qubit2 ::Int) ::Nothing
+    ccall(:swapGate, Cvoid, (Qureg, Cint, Cint),
+          qureg, qubit1, qubit2)
+    return nothing
+end
+
+function sqrtSwapGate(qureg ::Qureg, qubit1 ::Int, qubit2 ::Int) ::Nothing
+    ccall(:sqrtSwapGate, Cvoid, (Qureg, Cint, Cint),
+          qureg, qubit1, qubit2)
     return nothing
 end
 
@@ -568,7 +626,7 @@ end
 function multiControlledUnitary(qureg         ::Qureg,
                                 controlQubits ::Vector{Int32},
                                 targetQubit   ::Int,
-                                U             ::Array{Qreal,2})
+                                U             ::Array{Qreal,2}) ::Nothing
     @assert size(U) == (2,2)
     u = ComplexMatrix2(
         ( (real(u[1,1]), real(u[1,2])), (real(u[2,1]), real(u[2,2])) ),
@@ -579,6 +637,23 @@ function multiControlledUnitary(qureg         ::Qureg,
     return nothing
 end
 
+function multiStateControlledUnitary(qureg           ::Qureg,
+                                     controlQubits   ::Vector{Int32},
+                                     controlState    ::Vector{Int32},
+                                     targetQubit     ::Int,
+                                     U               ::Array{Qreal,2}) ::Nothing
+    @assert size(U) == (2,2)
+    @assert length(controlQubits) == length(controlState)
+    u = ComplexMatrix2(
+        ( (real(u[1,1]), real(u[1,2])), (real(u[2,1]), real(u[2,2])) ),
+        ( (imag(u[1,1]), imag(u[1,2])), (imag(u[2,1]), imag(u[2,2])) )  )
+
+    ccall(:multiStateControlledUnitary,
+          Cvoid,
+          (Qureg, Ptr{Cint}, Ptr{Cint}, Cint, Cint, ComplexMatrix2),
+          qureg, controlQubits, controlState, length(controlQubits), targetQubit, u)
+    return nothing
+end
 
 #
 # 3. Noise
@@ -630,7 +705,13 @@ function mixPauli(qureg       ::Qureg,
     return nothing
 end
 
-CONTINUE HERE 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄 🡄
+function mixDensityMatrix(combineQureg ::Qureg,
+                          prob         ::Qreal,
+                          otherQureg   ::Qureg)  ::Nothing
+    ccall(:mixDensityMatrix, Cvoid, (Qureg, Qreal, Qureg),
+          combineQureg, prob, otherQureg)
+    return nothing
+end
 
 
 ## Julia Module Init #----------------------------------------------------------
