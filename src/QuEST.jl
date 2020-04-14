@@ -1,3 +1,13 @@
+
+
+WIP
+
+CONTINUE WITH
+void setWeightedQureg(Complex fac1, Qureg qureg1, Complex fac2, Qureg qureg2, Complex facOut, Qureg out);
+void setWeightedQureg(Complex fac1, Qureg qureg1, Complex fac2, Qureg qureg2, Complex facOut, Qureg out);
+
+
+
 module QuEST
 
 include("QuEST_h.jl")
@@ -149,20 +159,34 @@ function createComplexMatrixN(numQubits ::Int) ::ComplexMatrixN;
                  numQubits)
 end
 
+function make_QuEST_matrix(M ::Matrix{Qreal}) ::ComplexMatrixN
+    (R,C) = size(M)
+    @assert R==C
+    MQ = createComplexMatrixN(R)
+    for c = 1:R                       # Julia is column major
+        for r = 1:R
+            re_MQ_r = unsafe_load(M.real,r)
+            im_MQ_r = unsafe_load(M.real,r)
+            unsafe_store!(re_MQ_r, real(M[r,c]), c)
+            unsafe_store!(im_MQ_r, imag(M[r,c]), c)
+        end
+    end
+end
+
 function destroyComplexMatrixN(M ::ComplexMatrixN) ::Nothing
     ccall(:destroyComplexMatrixN, Cvoid, (ComplexMatrixN,),
           M)
     return nothing
 end
 
-function fill_ComplexMatrix!(M ::ComplexMatrixN, M_ ::Function) ::Nothing where T
+function fill_ComplexMatrix!(M ::ComplexMatrixN, M_ ::Function) ::Nothing
     N = 2^M.numQubits
     for k = 1:N
         re_M_k = unsafe_load(M.real,k)
         im_M_k = unsafe_load(M.real,k)
         for ℓ = 1:N
-            unsafe_store!(re_M_k,ℓ) = real( M_(k,ℓ) )
-            unsafe_store!(im_M_k,ℓ) = imag( M_(k,ℓ) )
+            unsafe_store!(re_M_k, real(M_(k,ℓ)), ℓ)
+            unsafe_store!(im_M_k, imag(M_(k,ℓ)), ℓ)
         end
     end
     return nothing
@@ -304,13 +328,33 @@ function calcProbOfOutcome(qureg        ::Qureg,
     return p
 end
 
+
+
 function calcExpecPauliProd(qureg        ::Qureg,
-                            targetQubits ::Vector{Int32}
+                            targetQubits ::Vector{Int32},
                             pauliCodes   ::Vector{Int32},
                             workspace    ::Qureg)          ::Float64
+    @assert length(targetQubits) == length(pauliCodes)
+    @assert all( σ -> 0 ≤ σ ≤ 3,   pauliCodes )
+
     ccall(:calcExpecPauliProd, Qreal, (Qureg, Ptr{Cint}, Ptr{Cint}, Cint, Qureg),
           qureg, targetQubits, pauliCodes, length(targetQubits),  workspace)
+
     return nothing
+end
+
+function calcExpecPauliSum(qureg         ::Qureg,
+                           allPauliCodes ::Vector{Int32},
+                           termCoeffs    ::Vector{Qreal},
+                           workspace     ::Qureg)          ::Float64
+
+    @assert length(allPauliCodes) ==  length(termCoeffs) * getNumQubits(qureg)
+    @assert all( σ -> 0 ≤ σ ≤ 3,  allPauliCodes )
+
+    ex = ccall(:calcExpecPauliSum, Qreal, (Qureg, Ptr{Cint}, Ptr{Qreal}, Cint, Qureg),
+               qureg, allPauliCodes, termCoeffs, length(termCoeffs),  workspace)
+
+    return ex
 end
 
 
@@ -336,6 +380,12 @@ function calcFidelity(qureg ::Qureg, pureState ::Qureg) ::Float64
     fi = ccall(:calcFidelity, Qreal, (Qureg, Qureg),
                qureg, pureState)
     return fi
+end
+
+function calcHilbertSchmidtDistance(a ::Qureg, b ::Qureg) ::Float64
+    hsd = ccall(:calcHilbertSchmidtDistance, Qreal, (Qureg, Qureg),
+                a, b)
+    return hsd
 end
 
 #
@@ -536,9 +586,11 @@ function multiRotatePauli(qureg         ::Qureg,
                           targetPaulis  ::Vector{Int32},
                           angle         ::Qreal)          ::Nothing
     @assert length(targetQubits) == length(targetPaulis)
-    @assert all( i -> 0 ≤ targetPaulis[i] ≤ 3,      1:length(targetPaulis) )
+    @assert all( σ -> 0 ≤ σ ≤ 3,   targetPaulis )
+
     ccall(:multiRotatePauli, Cvoid, (Qureg, Ptr{Cint}, Ptr{Cint}, Cint, Qreal),
           qureg, targetQubits, targetPaulis, length(targetPaulis), angle)
+
     return nothing
 end
 
@@ -596,13 +648,19 @@ function controlledCompactUnitary(qureg          ::Qureg,
     return nothing
     end
 
-function unitary(qureg           ::Qureg,
-                 targetQubit     ::Int,
-                 U               ::Array{Qreal,2}) ::Nothing
+function _quest_mtx_2(U ::Matrix{Complex{Qreal}}) ::ComplexMatrix2
     @assert size(U) == (2,2)
     u = ComplexMatrix2(
         ( (real(u[1,1]), real(u[1,2])), (real(u[2,1]), real(u[2,2])) ),
         ( (imag(u[1,1]), imag(u[1,2])), (imag(u[2,1]), imag(u[2,2])) )  )
+    return u
+end
+
+function unitary(qureg           ::Qureg,
+                 targetQubit     ::Int,
+                 U               ::Matrix{Complex{Qreal}}) ::Nothing
+
+    u = _quest_mtx_2(U)
 
     ccall(:unitary, Cvoid, (Qureg, Cint, ComplexMatrix2),
           qureg, targetQubit,  u)
@@ -612,11 +670,9 @@ end
 function controlledUnitary(qureg        ::Qureg,
                            controlQubit ::Int,
                            targetQubit  ::Int,
-                           U            ::Array{Qreal,2}) ::Nothing
-    @assert size(U) == (2,2)
-    u = ComplexMatrix2(
-        ( (real(u[1,1]), real(u[1,2])), (real(u[2,1]), real(u[2,2])) ),
-        ( (imag(u[1,1]), imag(u[1,2])), (imag(u[2,1]), imag(u[2,2])) )  )
+                           U            ::Matrix{Complex{Qreal}}) ::Nothing
+
+    u = _quest_mtx_2(U)
 
     ccall(:controlledUnitary, Cvoid, (Qureg, Cint, Cint, u),
           qureg, controlQubit, targetQubit, ComplexMatrix2)
@@ -626,11 +682,8 @@ end
 function multiControlledUnitary(qureg         ::Qureg,
                                 controlQubits ::Vector{Int32},
                                 targetQubit   ::Int,
-                                U             ::Array{Qreal,2}) ::Nothing
-    @assert size(U) == (2,2)
-    u = ComplexMatrix2(
-        ( (real(u[1,1]), real(u[1,2])), (real(u[2,1]), real(u[2,2])) ),
-        ( (imag(u[1,1]), imag(u[1,2])), (imag(u[2,1]), imag(u[2,2])) )  )
+                                U             ::Matrix{Complex{Qreal}}) ::Nothing
+    u = _quest_mtx_2(U)
 
     ccall(:multiControlledUnitary, Cvoid, (Qureg, Ptr{Cint}, Cint, Cint, ComplexMatrix2),
           qureg, controlQubits, length(controlQubits),  targetQubit, u)
@@ -641,17 +694,91 @@ function multiStateControlledUnitary(qureg           ::Qureg,
                                      controlQubits   ::Vector{Int32},
                                      controlState    ::Vector{Int32},
                                      targetQubit     ::Int,
-                                     U               ::Array{Qreal,2}) ::Nothing
-    @assert size(U) == (2,2)
+                                     U               ::Matrix{Complex{Qreal}}) ::Nothing
+
     @assert length(controlQubits) == length(controlState)
-    u = ComplexMatrix2(
-        ( (real(u[1,1]), real(u[1,2])), (real(u[2,1]), real(u[2,2])) ),
-        ( (imag(u[1,1]), imag(u[1,2])), (imag(u[2,1]), imag(u[2,2])) )  )
+    u = _quest_mtx_2(U)
 
     ccall(:multiStateControlledUnitary,
           Cvoid,
           (Qureg, Ptr{Cint}, Ptr{Cint}, Cint, Cint, ComplexMatrix2),
           qureg, controlQubits, controlState, length(controlQubits), targetQubit, u)
+    return nothing
+end
+
+function _quest_mtx_4(U ::Matrix{Complex{Qreal}}) ::ComplexMatrix4
+    @assert size(U) = (4,4)
+    u = ComplexMatrix4( ( ( real(U[1,1]), real(U[1,2]), real(U[1,3]), real(U[1,4]) ),
+                          ( real(U[2,1]), real(U[2,2]), real(U[2,3]), real(U[2,4]) ),
+                          ( real(U[3,1]), real(U[3,2]), real(U[3,3]), real(U[3,4]) ),
+                          ( real(U[4,1]), real(U[4,2]), real(U[4,3]), real(U[4,4]) ) ),
+                        ( ( imag(U[1,1]), imag(U[1,2]), imag(U[1,3]), imag(U[1,4]) ),
+                          ( imag(U[2,1]), imag(U[2,2]), imag(U[2,3]), imag(U[2,4]) ),
+                          ( imag(U[3,1]), imag(U[3,2]), imag(U[3,3]), imag(U[3,4]) ),
+                          ( imag(U[4,1]), imag(U[4,2]), imag(U[4,3]), imag(U[4,4]) ) )  )
+end
+
+
+function twoQubitUnitary(qureg           ::Qureg,
+                         targetQubit1    ::Int,
+                         targetQubit2    ::Int,
+                         U               ::Matrix{Complex{Qreal}}) ::Nothing
+    u = _quest_mtx_4(U)
+    ccall(:twoQubitUnitary, Cvoid, (Qureg, Cint, Cint, ComplexMatrix4),
+          qureg, targetQubit1, targetQubit2, u)
+
+    return nothing
+end
+
+
+
+function controlledTwoQubitUnitary(qureg         ::Qureg,
+                                   controlQubit  ::Int,
+                                   targetQubit1  ::Int,
+                                   targetQubit2  ::Int,
+                                   U             ::Matrix{Complex{Qreal}}) ::Nothing
+    u = _quest_mtx_4(U)
+    ccall(:controlledTwoQubitUnitary, Cvoid, (Qureg, Cint, Cint, Cint, ComplexMatrix4),
+          qureg, controlQubit, targetQubit1, targetQubit2, u)
+    return nothing
+end
+
+function multiControlledTwoQubitUnitary(qureg         ::Qureg,
+                                        controlQubits ::Vector{Int32},
+                                        targetQubit1 ::Int,
+                                        targetQubit2 ::Int,
+                                        U            ::Matrix{Complex{Qreal}}) ::Nothing
+    u = _quest_mtx_4(U)
+    ccall(:multiControlledTwoQubitUnitary, Cvoid, (Qureg, Ptr{Cint}, Cint, Cint, Cint, ComplexMatrix4),
+          qureg, controlQubits, length(controlQubits),  targetQubit1, targetQubit2, u)
+    return nothing
+end
+
+function multiQubitUnitary(qureg ::Qureg,
+                           targs ::Vector{Int32},
+                           u     ::ComplexMatrixN) ::Nothing
+    ccall(:multiQubitUnitary, Cvoid, (Qureg, Ptr{Cint}, Cint, ComplexMatrixN),
+          qureg, targs, length(targs), u)
+    return nothing
+end
+
+function controlledMultiQubitUnitary(qureg   ::Qureg,
+                                     ctrl    ::Int,
+                                     targs   ::Vector{Int32},
+                                     u       ::ComplexMatrixN) ::Nothing
+    ccall(:controlledMultiQubitUnitary, Cvoid, (Qureg, Cint, Ptr{Cint}, Cint, ComplexMatrixN),
+          qureg, ctrl, targs, length(targs), u)
+    return nothing
+end
+
+function multiControlledMultiQubitUnitary(qureg  ::Qureg,
+                                          ctrls  ::Vector{Int32},
+                                          targs  ::Vector{Int32},
+                                          u      ::ComplexMatrixN) ::Nothing
+    ccall(:multiControlledMultiQubitUnitary,
+          Cvoid,
+          (Qureg, Ptr{Cint}, Cint, Ptr{Cint}, Cint, ComplexMatrixN),
+          qureg, ctrls, length(ctrls), targs, length(targs), u)
     return nothing
 end
 
@@ -713,6 +840,40 @@ function mixDensityMatrix(combineQureg ::Qureg,
     return nothing
 end
 
+function mixKrausMap(qureg   ::Qureg,
+                     target  ::Int,
+                     ops     ::Vector{Matrix{Complex{Qreal}}}) ::Nothing
+
+    @assert 1 ≤ length(ops) ≤ 4
+    qops = [ _quest_mtx_2(op) for op in ops ]
+    ccall(:mixKrausMap, Cvoid, (Qureg, Cint, Ptr{ComplexMatrix2}, Cint),
+          qureg, target, qops, length(ops))
+    nothing;
+end
+
+function mixTwoQubitKrausMap(qureg    ::Qureg,
+                             target1  ::Int,
+                             target2  ::Int,
+                             ops      ::Vector{Matrix{Complex{Qreal}}}) ::Nothing
+    @assert 1 ≤ length(ops) ≤ 16
+    qops = [ _quest_mtx_4(op) for op in ops ]
+    ccall(:mixTwoQubitKrausMap,
+          Cvoid,
+          (Qureg, Cint, Cint, Ptr{ComplexMatrix4}, Cint),
+          qureg, target1, target2, qops, length(ops))
+    nothing;
+end
+
+function mixMultiQubitKrausMap(qureg    ::Qureg,
+                               targets  ::Vector{Int32},
+                               ops      ::Vector{ComplexMatrixN}) ::Nothing
+    N = length(targets)
+    @assert 1 ≤ length(ops) ≤ (2N)^2
+    ccall(:mixMultiQubitKrausMap, Cvoid,
+          (Qureg, Ptr{Cint}, Cint, Ptr{ComplexMatrixN}, Cint),
+           qureg, targets, length(targets), ops, length(ops))
+    nothing;
+end
 
 ## Julia Module Init #----------------------------------------------------------
 #
