@@ -1,13 +1,3 @@
-
-
-WIP
-
-CONTINUE WITH
-void setWeightedQureg(Complex fac1, Qureg qureg1, Complex fac2, Qureg qureg2, Complex facOut, Qureg out);
-void setWeightedQureg(Complex fac1, Qureg qureg1, Complex fac2, Qureg qureg2, Complex facOut, Qureg out);
-
-
-
 module QuEST
 
 include("QuEST_h.jl")
@@ -292,6 +282,21 @@ function cloneQureg(targetQureg ::Qureg, copyQureg ::Qureg) ::Nothing
     return nothing
 end
 
+
+function setWeightedQureg(fac1   ::Complex{Float64},   qureg1 ::Qureg,
+                          fac2   ::Complex{Float64},   qureg2 ::Qureg,
+                          facOut ::Complex{Float64},   out    ::Qureg) ::Nothing
+    ccall(:setWeightedQureg,
+          Cvoid,
+          (QuEST_h.Complex, Qureg,
+           QuEST_h.Complex fac2, Qureg qureg2,
+           QuEST_h.Complex facOut, Qureg out),
+          QuEST_h.Complex(Qreal(real(fac1)),Qreal(real(fac1))), qureg1,
+          QuEST_h.Complex(Qreal(real(fac2)),Qreal(real(fac2))), qureg2,
+          QuEST_h.Complex(Qreal(real(out)),Qreal(real(out))), out)
+    nothing;
+end
+
 #
 # 5. Query state
 #
@@ -421,6 +426,7 @@ end
 #    1. Gates
 #    2. Unitary matrices
 #    3. Noise
+#    4. Other ops
 #
 #-------------------------------------------------------------------------------
 
@@ -872,6 +878,23 @@ function mixMultiQubitKrausMap(qureg    ::Qureg,
     ccall(:mixMultiQubitKrausMap, Cvoid,
           (Qureg, Ptr{Cint}, Cint, Ptr{ComplexMatrixN}, Cint),
            qureg, targets, length(targets), ops, length(ops))
+    nothing;
+end
+
+#
+# 4. Other ops
+#
+
+function applyPauliSum(inQureg        ::Qureg,
+                       allPauliCodes  ::Vector{Int32},
+                       termCoeffs     ::Vector{Qreal},
+                       numSumTerms    ::Int,
+                       outQureg       ::Qureg)          ::Nothing
+    @assert length(termCoeffs) == numSumTerms * getNumQubits(qureg)
+
+    ccall(:applyPauliSum, Cvoid, (Qureg, Ptr{Cint}, Ptr{Qreal}, Cint, Qureg),
+          inQureg, allPauliCodes, termCoeffs, numSumTerms, outQureg)
+
     nothing;
 end
 
