@@ -17,36 +17,43 @@ function seedQuESTDefault() ::Nothing
 end
 
 function seedQuEST(seedarray ::Vector{Int}) ::Nothing
+    @assert  ! isempty(seedarray)
+
     ccall(:seedQuESTDefault, Cvoid, (Ptr{Clong},Cint),
           seedarray, length(seedarray))
-    return nothing
+    nothing;
 end
 
-function void startRecordingQASM(qureg ::Qureg) ::Nothing
+function startRecordingQASM(qureg ::Qureg) ::Nothing
     ccall(:startRecordingQASM, Cvoid, (Qureg),
           qureg)
-    return nothing
+    nothing;
 end
-function void stopRecordingQASM(qureg ::Qureg) ::Nothing
+function stopRecordingQASM(qureg ::Qureg) ::Nothing
     ccall(:stopRecordingQASM, Cvoid, (Qureg),
           qureg)
-    return nothing
+    nothing;
 end
-function void clearRecordedQASM(qureg ::Qureg) ::Nothing
+function clearRecordedQASM(qureg ::Qureg) ::Nothing
     ccall(:clearRecordedQASM, Cvoid, (Qureg),
           qureg)
-    return nothing
+    nothing;
 end
-function void printRecordedQASM(qureg ::Qureg) ::Nothing
+function printRecordedQASM(qureg ::Qureg) ::Nothing
     ccall(:printRecordedQASM, Cvoid, (Qureg),
           qureg)
-    return nothing
+    nothing;
 end
-function void writeRecordedQASMToFile(qureg    ::Qureg,
-                                      filename ::String) ::Nothing
+function writeRecordedQASMToFile(qureg    ::Qureg,
+                                 filename ::String) ::Nothing
+    @assert begin
+        ios = open(filename, "w")
+        close(ios) == nothing
+    end
+
     ccall(:writeRecordedQASMToFile, Cvoid, (Qureg, Cstring),
           qureg, filename)
-    return nothing
+    nothing;
 end
 
 ## Env #------------------------------------------------------------------------
@@ -60,8 +67,7 @@ end
 #-------------------------------------------------------------------------------
 
 function createQuESTEnv() :: QuESTEnv
-    return ccall(:createQuESTEnv, QuESTEnv, ()
-                 )
+    return ccall(:createQuESTEnv, QuESTEnv, () )
 end
 
 function destroyQuESTEnv(env ::QuESTEnv) ::Nothing
@@ -120,11 +126,15 @@ end
 
 
 function createQureg(numQubits ::Int, env ::QuESTEnv) ::Qureg
+    @assert 1 ≤ numQubits ≤ 50
+
     return ccall(:createQureg, Qureg, (Cint,QuESTEnv),
                  numQubits, env)
 end
 
 function createDensityQureg(numQubits ::Int, env ::QuESTEnv) ::Qureg
+    @assert 1 ≤ numQubits ≤ 50
+
     return ccall(:createDensityQureg, Qureg, (Cint,QuESTEnv),
                  numQubits, env)
 end
@@ -145,6 +155,8 @@ end
 #
 
 function createComplexMatrixN(numQubits ::Int) ::ComplexMatrixN;
+    @assert 1 ≤ numQubits ≤ 50
+
     return ccall(:createComplexMatrixN, ComplexMatrixN, (Cint,),
                  numQubits)
 end
@@ -152,7 +164,12 @@ end
 function make_QuEST_matrix(M ::Matrix{Qreal}) ::ComplexMatrixN
     (R,C) = size(M)
     @assert R==C
-    MQ = createComplexMatrixN(R)
+    @assert R ≥ 2
+    numQubits = Int(round( log2(R) ))
+    @assert 2^numQubits == R
+    @assert 1 ≤ numQubits ≤ 50
+
+    MQ = createComplexMatrixN(numQubits)
     for c = 1:R                       # Julia is column major
         for r = 1:R
             re_MQ_r = unsafe_load(M.real,r)
@@ -161,12 +178,13 @@ function make_QuEST_matrix(M ::Matrix{Qreal}) ::ComplexMatrixN
             unsafe_store!(im_MQ_r, imag(M[r,c]), c)
         end
     end
+    return MQ
 end
 
 function destroyComplexMatrixN(M ::ComplexMatrixN) ::Nothing
     ccall(:destroyComplexMatrixN, Cvoid, (ComplexMatrixN,),
           M)
-    return nothing
+    nothing
 end
 
 function fill_ComplexMatrix!(M ::ComplexMatrixN, M_ ::Function) ::Nothing
@@ -179,7 +197,7 @@ function fill_ComplexMatrix!(M ::ComplexMatrixN, M_ ::Function) ::Nothing
             unsafe_store!(im_M_k, imag(M_(k,ℓ)), ℓ)
         end
     end
-    return nothing
+    nothing
 end
 
 #
@@ -190,7 +208,7 @@ end
 function reportState(qureg ::Qureg) ::Nothing
     ccall(:reportState, Qureg, (),
           qureg)
-    return nothing
+    nothing;
 end
 
 function reportStateToScreen(qureg ::Qureg, env ::QuESTEnv, reportRank ::Int) ::Nothing
@@ -217,6 +235,8 @@ function getNumAmps(qureg ::Qureg) ::Int
                  qureg)
 end
 
+
+WIP: CONTINUE HERE with adding `@assert`s
 
 #
 # 4. Init state
@@ -302,6 +322,8 @@ end
 #
 
 function getAmp(qureg ::Qureg,  idx ::Int) ::Complex{Qreal}
+    @assert 
+
     α = ccall(:getAmp, QuEST_h.Complex, (Qureg, Clonglong),
                qureg, idx)
     return Complex{Qreal}(α.real,α.imag)
