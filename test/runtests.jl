@@ -34,11 +34,13 @@ using Test
 
 @show QuEST.Qureg
 
-function test_env()
+function test_start()
     env = QuEST.createQuESTEnv()
     test_qureg(env)
     test_densiQureg(env)
     QuEST.destroyQuESTEnv(env)
+
+    test_matrices()
 end
 
 function test_densiQureg(env ::QuEST.QuESTEnv)
@@ -53,19 +55,20 @@ function test_qureg(env ::QuEST.QuESTEnv)
     QuEST.destroyQureg(qureg,env)
 end
 
-function test_2quregs(q1 ::QuEST.Qureg, q2 ::QuEST.Qureg, env ::QuEST.QuESTEnv)
-
+function test_matrices()
     M = createComplexMatrixN(3)
     fill_ComplexMatrixN!(M, (k,ℓ) -> exp(i*(k+ℓ))/sqrt(8) )
     destroyComplexMatrixN(M)
+end
 
+function test_2quregs(q1 ::QuEST.Qureg, q2 ::QuEST.Qureg, env ::QuEST.QuESTEnv)
     q11 = createCloneQureg(q1,env)
     q22 = createCloneQureg(q2,env)
 end
 
 
+#
 
-
-test_env()
+test_start()
 
 # EOF
