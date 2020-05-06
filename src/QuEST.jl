@@ -56,22 +56,22 @@ function seedQuEST(seedarray ::Vector{Int}) ::Nothing
 end
 
 function startRecordingQASM(qureg ::Qureg) ::Nothing
-    ccall(:startRecordingQASM, Cvoid, (Qureg),
+    ccall(:startRecordingQASM, Cvoid, (Qureg,),
           qureg)
     nothing;
 end
 function stopRecordingQASM(qureg ::Qureg) ::Nothing
-    ccall(:stopRecordingQASM, Cvoid, (Qureg),
+    ccall(:stopRecordingQASM, Cvoid, (Qureg,),
           qureg)
     nothing;
 end
 function clearRecordedQASM(qureg ::Qureg) ::Nothing
-    ccall(:clearRecordedQASM, Cvoid, (Qureg),
+    ccall(:clearRecordedQASM, Cvoid, (Qureg,),
           qureg)
     nothing;
 end
 function printRecordedQASM(qureg ::Qureg) ::Nothing
-    ccall(:printRecordedQASM, Cvoid, (Qureg),
+    ccall(:printRecordedQASM, Cvoid, (Qureg,),
           qureg)
     nothing;
 end
@@ -237,7 +237,7 @@ end
 
 
 function reportState(qureg ::Qureg) ::Nothing
-    ccall(:reportState, Qureg, (),
+    ccall(:reportState, Cvoid, (Qureg,),
           qureg)
     nothing;
 end
@@ -267,7 +267,7 @@ function getNumAmps(qureg ::Qureg) ::Int
 end
 
 
-WIP: CONTINUE HERE with adding `@assert`s
+## WIP: CONTINUE HERE with adding `@assert`s
 
 #
 # 4. Init state
@@ -340,8 +340,8 @@ function setWeightedQureg(fac1   ::Complex{Float64},   qureg1 ::Qureg,
     ccall(:setWeightedQureg,
           Cvoid,
           (QuEST_h.Complex, Qureg,
-           QuEST_h.Complex fac2, Qureg qureg2,
-           QuEST_h.Complex facOut, Qureg out),
+           QuEST_h.Complex, Qureg,
+           QuEST_h.Complex, Qureg),
           QuEST_h.Complex(Qreal(real(fac1)),Qreal(real(fac1))), qureg1,
           QuEST_h.Complex(Qreal(real(fac2)),Qreal(real(fac2))), qureg2,
           QuEST_h.Complex(Qreal(real(out)),Qreal(real(out))), out)
@@ -353,8 +353,6 @@ end
 #
 
 function getAmp(qureg ::Qureg,  idx ::Int) ::Complex{Qreal}
-    @assert 
-
     α = ccall(:getAmp, QuEST_h.Complex, (Qureg, Clonglong),
                qureg, idx)
     return Complex{Qreal}(α.real,α.imag)
@@ -507,8 +505,8 @@ end
 function multiControlledPhaseShift(qureg         ::Qureg,
                                    controlQubits ::Vector{Int32},
                                    angle         ::Qreal)         ::Nothing
-    ccall(:multiControlledPhaseShift, Cvoid, (Qureg, Ptr{Cint}, Cint, Qreal)
-          qureg, controlQubits, length(controlQubits),  angle),
+    ccall(:multiControlledPhaseShift, Cvoid, (Qureg, Ptr{Cint}, Cint, Qreal),
+          qureg, controlQubits, length(controlQubits),  angle)
     return nothing
 end
 
@@ -561,7 +559,7 @@ end
 
 function controlledNot(qureg         ::Qureg,
                        controlQubit  ::Int,
-                       targetQubit   ::int)   ::Nothing
+                       targetQubit   ::Int)   ::Nothing
     ccall(:controlledNot, Cvoid, (Qureg, Cint, Cint),
            qureg, controlQubit, targetQubit)
     return nothing
@@ -569,7 +567,7 @@ end
 
 function controlledPauliY(qureg         ::Qureg,
                        controlQubit  ::Int,
-                       targetQubit   ::int)   ::Nothing
+                       targetQubit   ::Int)   ::Nothing
     ccall(:controlledPauliY, Cvoid, (Qureg, Cint, Cint),
            qureg, controlQubit, targetQubit)
     return nothing
@@ -577,7 +575,7 @@ end
 
 function controlledPauliZ(qureg         ::Qureg,
                        controlQubit  ::Int,
-                       targetQubit   ::int)   ::Nothing
+                       targetQubit   ::Int)   ::Nothing
     ccall(:controlledPauliZ, Cvoid, (Qureg, Cint, Cint),
            qureg, controlQubit, targetQubit)
     return nothing
@@ -635,7 +633,7 @@ end
 function multiRotateZ(qureg      ::Qureg,
                       qubits     ::Vector{Int32},
                       angle      ::Qreal)         ::Nothing
-    ccall(:multiRotateZ, Cvoid, (Qureg, Ptr{int}, Cint, Qreal),
+    ccall(:multiRotateZ, Cvoid, (Qureg, Ptr{Cint}, Cint, Qreal),
           qureg, qubits, length(qubits), angle)
     return nothing
 end
@@ -733,8 +731,8 @@ function controlledUnitary(qureg        ::Qureg,
 
     u = _quest_mtx_2(U)
 
-    ccall(:controlledUnitary, Cvoid, (Qureg, Cint, Cint, u),
-          qureg, controlQubit, targetQubit, ComplexMatrix2)
+    ccall(:controlledUnitary, Cvoid, (Qureg, Cint, Cint, ComplexMatrix2),
+          qureg, controlQubit, targetQubit, u)
     return nothing
 end
 
