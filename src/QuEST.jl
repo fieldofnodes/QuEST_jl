@@ -34,7 +34,7 @@ module QuEST
 include("QuEST_h.jl")
 
 using .QuEST_h
-using .QuEST_h.Qreal
+using .QuEST_h: Qreal       # workaround for bug in vscode.jl
 
 ## Misc #-----------------------------------------------------------------------
 #
@@ -79,7 +79,7 @@ function writeRecordedQASMToFile(qureg    ::Qureg,
                                  filename ::String) ::Nothing
     @assert begin
         ios = open(filename, "w")
-        close(ios) == nothing
+        close(ios) === nothing
     end
 
     ccall(:writeRecordedQASMToFile, Cvoid, (Qureg, Cstring),
