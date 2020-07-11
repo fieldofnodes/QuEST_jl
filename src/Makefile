@@ -10,12 +10,9 @@ OBJECTS = $(SOURCES:%.c=%.o)
 DEPENDS = $(SOURCES:%.c=%.d)
 
 
-QUEST_INCL_DIR = $(HOME)/my.local/include/
-QUEST_LIB_DIR  = $(HOME)/my.local/lib/
-
-CPPFLAGS = -D QuEST_PREC=$(QUEST_PREC) -D _GNU_SOURCE -MMD -MP -I$(QUEST_INCL_DIR)
+CPPFLAGS = -D QuEST_PREC=$(QUEST_PREC) -D _GNU_SOURCE -MMD -MP $(C_INCLUDES)
 CFLAGS   = -Wall -Wextra
-LDFLAGS  = -L$(QUEST_LIB_DIR) -lm
+LDFLAGS  = $(C_LIBS) -lm
 
 CC      = $(GCC) $(CPPFLAGS) $(CFLAGS)
 LD      = $(GCC) -Wall -Wextra

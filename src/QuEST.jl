@@ -34,7 +34,7 @@ module QuEST
 include("QuEST_h.jl")
 
 using .QuEST_h
-
+using .QuEST_h.Qreal
 
 ## Misc #-----------------------------------------------------------------------
 #
@@ -359,7 +359,7 @@ function getAmp(qureg ::Qureg,  idx ::Int) ::Complex{Qreal}
 end
 
 function getProbAmp(qureg ::Qureg, idx ::Int) :: Qreal
-    ccall(:getProbAmp, Qreal, (Qureg, Clonglong),
+    p = ccall(:getProbAmp, Qreal, (Qureg, Clonglong),
                qureg, idx)
     return p
 end
@@ -609,7 +609,7 @@ function controlledRotateX(qureg         ::Qureg,
                            angle         ::Qreal)  ::Nothing
     ccall(:controlledRotateX, Cvoid, (Qureg, Cint, Cint, Qreal),
           qureg, controlQubit, targetQubit, angle)
-    return nohting
+    return nothing
 end
 
 function controlledRotateY(qureg         ::Qureg,
@@ -618,7 +618,7 @@ function controlledRotateY(qureg         ::Qureg,
                            angle         ::Qreal)  ::Nothing
     ccall(:controlledRotateY, Cvoid, (Qureg, Cint, Cint, Qreal),
           qureg, controlQubit, targetQubit, angle)
-    return nohting
+    return nothing
 end
 
 function controlledRotateZ(qureg         ::Qureg,
@@ -627,7 +627,7 @@ function controlledRotateZ(qureg         ::Qureg,
                            angle         ::Qreal)  ::Nothing
     ccall(:controlledRotateZ, Cvoid, (Qureg, Cint, Cint, Qreal),
           qureg, controlQubit, targetQubit, angle)
-    return nohting
+    return nothing
 end
 
 function multiRotateZ(qureg      ::Qureg,
@@ -708,8 +708,8 @@ function controlledCompactUnitary(qureg          ::Qureg,
 function _quest_mtx_2(U ::Matrix{Complex{Qreal}}) ::ComplexMatrix2
     @assert size(U) == (2,2)
     u = ComplexMatrix2(
-        ( (real(u[1,1]), real(u[1,2])), (real(u[2,1]), real(u[2,2])) ),
-        ( (imag(u[1,1]), imag(u[1,2])), (imag(u[2,1]), imag(u[2,2])) )  )
+        ( (real(U[1,1]), real(U[1,2])), (real(U[2,1]), real(U[2,2])) ),
+        ( (imag(U[1,1]), imag(U[1,2])), (imag(U[2,1]), imag(U[2,2])) )  )
     return u
 end
 
@@ -941,7 +941,7 @@ function applyPauliSum(inQureg        ::Qureg,
                        termCoeffs     ::Vector{Qreal},
                        numSumTerms    ::Int,
                        outQureg       ::Qureg)          ::Nothing
-    @assert length(termCoeffs) == numSumTerms * getNumQubits(qureg)
+    @assert length(termCoeffs) == numSumTerms * getNumQubits(inQureg)
 
     ccall(:applyPauliSum, Cvoid, (Qureg, Ptr{Cint}, Ptr{Qreal}, Cint, Qureg),
           inQureg, allPauliCodes, termCoeffs, numSumTerms, outQureg)
@@ -955,7 +955,7 @@ end
 #
 #-------------------------------------------------------------------------------
 
-using Libdl
+using Libdl: dlopen, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
 
 function __init__()
     dlopen("libQuEST",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
