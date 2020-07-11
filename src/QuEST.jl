@@ -176,7 +176,7 @@ function createCloneQureg(qureg ::Qureg, env ::QuESTEnv) ::Qureg
 end
 
 function destroyQureg(qureg ::Qureg, env ::QuESTEnv) ::Nothing
-    ccall(:destroyQureg, Qureg, (Cint,QuESTEnv),
+    ccall(:destroyQureg, Cvoid, (Qureg,QuESTEnv),
           qureg, env)
     return nothing
 end
@@ -192,6 +192,17 @@ function createComplexMatrixN(numQubits ::Int) ::ComplexMatrixN;
                  numQubits)
 end
 
+@doc raw"
+Function `make_QuEST_matrix(M ::Matrix{Qreal}) ::ComplexMatrixN`
+
+Convenience function for creating (`createComplexMatrixN()`) and filling a QuEST matrix data structure (`struct ComplexMatrixN`).
+
+### Input
+* `M` must be a 2ⁿ×2ⁿ matrix for 1 ≤ 𝑛 ≤ 50 (haha) [`@assert`]
+
+### Return value
+* An 𝑛 qubit matrix.
+"
 function make_QuEST_matrix(M ::Matrix{Qreal}) ::ComplexMatrixN
     (R,C) = size(M)
     @assert R==C
@@ -218,6 +229,20 @@ function destroyComplexMatrixN(M ::ComplexMatrixN) ::Nothing
     nothing
 end
 
+@doc raw"
+Function
+
+     fill_ComplexMatrix!(M ::ComplexMatrixN, F ::Function) ::Nothing
+
+Fills the entries of `M`: ∀(k,ℓ): 𝑀[k,ℓ] = 𝐹(k,ℓ).
+(Indices are in 1, ..., 2ⁿ.)
+
+### Input
+* `M` must have been ''created'' (`createComplexMatrixN()`)
+
+### Output
+* Entries of `M` are overwritten.
+"
 function fill_ComplexMatrix!(M ::ComplexMatrixN, M_ ::Function) ::Nothing
     N = 2^M.numQubits
     for k = 1:N

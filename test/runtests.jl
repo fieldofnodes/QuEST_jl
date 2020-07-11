@@ -32,7 +32,35 @@
 using QuEST
 using Test
 
-function test_start()
+function test_env_and_qureg()
+
+    function test_2quregs(q ::QuEST.Qureg, env ::QuEST.QuESTEnv)
+        q1 = QuEST.createCloneQureg(q,env)
+        q2 = QuEST.createCloneQureg(q,env)
+        @warn "need more here"
+    end
+    function test_qureg(env ::QuEST.QuESTEnv)
+        qureg = QuEST.createQureg(8,env)
+        test_2quregs(qureg,env)
+        QuEST.destroyQureg(qureg,env)
+        @warn "need more here"
+    end
+    
+    function test_densiQureg(env ::QuEST.QuESTEnv)
+        qureg = QuEST.createDensityQureg(8,env)
+        test_2quregs(qureg,env)
+        QuEST.destroyQureg(qureg,env)
+        @warn "need more here"
+    end
+    
+    function test_matrices()
+        M = QuEST.createComplexMatrixN(3)
+        QuEST.fill_ComplexMatrix!(M, (k,ℓ) -> exp(im*(k+ℓ))/sqrt(8) )
+        QuEST.destroyComplexMatrixN(M)
+        @warn "need more here"
+    end
+
+
     env = QuEST.createQuESTEnv()
     test_qureg(env)
     test_densiQureg(env)
@@ -41,32 +69,9 @@ function test_start()
     test_matrices()
 end
 
-function test_densiQureg(env ::QuEST.QuESTEnv)
-    qureg = QuEST.createDensityQureg(8,env)
-    test_2quregs(qureg,env)
-    QuEST.destroyQureg(qureg,env)
-end
-
-function test_qureg(env ::QuEST.QuESTEnv)
-    qureg = QuEST.createQureg(8,env)
-    test_2quregs(qureg,env)
-    QuEST.destroyQureg(qureg,env)
-end
-
-function test_matrices()
-    M = createComplexMatrixN(3)
-    fill_ComplexMatrixN!(M, (k,ℓ) -> exp(i*(k+ℓ))/sqrt(8) )
-    destroyComplexMatrixN(M)
-end
-
-function test_2quregs(q ::QuEST.Qureg, env ::QuEST.QuESTEnv)
-    q1 = QuEST.createCloneQureg(q,env)
-    q2 = QuEST.createCloneQureg(q,env)
-end
-
-
 #
-
-test_start()
+@testset "QuEST.jl" begin
+    test_env_and_qureg()
+end
 
 # EOF
