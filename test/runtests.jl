@@ -1,3 +1,8 @@
+
+fuck = you + them
+
+
+
 # QuEST.jl/test/runtests.jl
 #
 # Authors:
@@ -29,10 +34,10 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+fuck = you + them
+
 using QuEST
 using Test
-
-@show QuEST.Qureg
 
 function test_start()
     env = QuEST.createQuESTEnv()
@@ -61,9 +66,9 @@ function test_matrices()
     destroyComplexMatrixN(M)
 end
 
-function test_2quregs(q1 ::QuEST.Qureg, q2 ::QuEST.Qureg, env ::QuEST.QuESTEnv)
-    q11 = createCloneQureg(q1,env)
-    q22 = createCloneQureg(q2,env)
+function test_2quregs(q ::QuEST.Qureg, env ::QuEST.QuESTEnv)
+    q1 = QuEST.createCloneQureg(q,env)
+    q2 = QuEST.createCloneQureg(q,env)
 end
 
 
