@@ -34,7 +34,11 @@ module QuEST
 include("QuEST_h.jl")
 
 using .QuEST_h
-using .QuEST_h: Qreal       # workaround for bug in vscode.jl
+using .QuEST_h: Qureg, Qreal
+
+include("_CHelpers.jl")
+
+using ._CHelpers: numQubits, isDensityMatrix
 
 ## Misc #-----------------------------------------------------------------------
 #
@@ -986,6 +990,14 @@ function __init__()
     dlopen("libQuEST",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
 end
 
+
+## Includes #-------------------------------------------------------------------
+#
+# Include Sub-Modules
+#
+#-------------------------------------------------------------------------------
+
+include("_Tomog.jl")
 
 end # module
 # EOF
