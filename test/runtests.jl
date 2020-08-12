@@ -69,6 +69,8 @@ function test_env_and_qureg()
     test_matrices()
 end
 
+
+
 #
 @testset "QuEST.jl" begin
     test_env_and_qureg()
