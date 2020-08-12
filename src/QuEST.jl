@@ -28,7 +28,6 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
 module QuEST
 
 include("QuEST_h.jl")
@@ -36,9 +35,9 @@ include("QuEST_h.jl")
 using .QuEST_h
 using .QuEST_h: Qureg, Qreal
 
-include("_CHelpers.jl")
+include("_HelpQuEST.jl")
 
-using ._CHelpers: numQubits, isDensityMatrix
+using ._HelpQuEST: numQubits, isDensityMatrix
 
 ## Misc #-----------------------------------------------------------------------
 #
@@ -422,10 +421,11 @@ function calcExpecPauliProd(qureg        ::Qureg,
     @assert length(targetQubits) == length(pauliCodes)
     @assert all( σ -> 0 ≤ σ ≤ 3,   pauliCodes )
 
-    ccall(:calcExpecPauliProd, Qreal, (Qureg, Ptr{Cint}, Ptr{Cint}, Cint, Qureg),
-          qureg, targetQubits, pauliCodes, length(targetQubits),  workspace)
+    expval = 
+           ccall(:calcExpecPauliProd, Qreal, (Qureg, Ptr{Cint}, Ptr{Cint}, Cint, Qureg),
+                 qureg, targetQubits, pauliCodes, length(targetQubits),  workspace)
 
-    return nothing
+    return expval
 end
 
 function calcExpecPauliSum(qureg         ::Qureg,
@@ -983,11 +983,10 @@ end
 # Init
 #
 #-------------------------------------------------------------------------------
-
 using Libdl: dlopen, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
 
 function __init__()
-    dlopen("libQuEST",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    # nothing to do...?
 end
 
 
