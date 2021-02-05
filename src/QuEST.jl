@@ -40,10 +40,22 @@ export numQubits, isDensityMatrix
 
 module QuESTbase32
 
+"""
+QuEST real number type with 32 bit precision.
+"""
 const Qreal = Float32
 
+"""
+Handle for quantum register (i.e., pointer to `struct qureg` from QuEST.h) with 32-bit precision
+"""
+const QuReg = _QuEST_Internals.QuReg32
+
 function __init__()
-    dlopen("libQuEST32",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    if _QuEST_Internals.EXPERT_USER
+        dlopen("libQuEST32_expert",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    else
+        dlopen("libQuEST32_novice",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    end
     dlopen(joinpath(@__DIR__,"C","lib_C_QuEST32.so"),
            RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
 
@@ -61,10 +73,22 @@ end
 
 module QuESTbase64
 
+"""
+QuEST real number type with 64 bit precision.
+"""
 const qreal = Float64
 
+"""
+Handle for quantum register (i.e., pointer to `struct qureg` from QuEST.h) with 64-bit precision
+"""
+const QuReg = _QuEST_Internals.QuReg64
+
 function __init__()
-    dlopen("libQuEST64",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    if _QuEST_Internals.EXPERT_USER
+        dlopen("libQuEST64_expert",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    else
+        dlopen("libQuEST64_novice",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    end
     dlopen(joinpath(@__DIR__,"C","lib_C_QuEST64.so"),
            RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
 
