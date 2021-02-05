@@ -30,14 +30,54 @@
 # SOFTWARE.
 module QuEST
 
-include("QuEST_h.jl")
+include("_QuEST_Internals.jl")
+include("_C_QuEST.jl")
 
-using .QuEST_h
-using .QuEST_h: Qureg, Qreal
+import _C_QuEST: numQubits, isDensityMatrix # ...
+export numQubits, isDensityMatrix
 
-include("_HelpQuEST.jl")
+################################################################################
 
-using ._HelpQuEST: numQubits, isDensityMatrix
+module QuESTbase32
+
+const Qreal = Float32
+
+function __init__()
+    dlopen("libQuEST32",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    dlopen(joinpath(@__DIR__,"C","lib_C_QuEST32.so"),
+           RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+
+    if CHECK-THE-SIZE of qreal, see if it's really correct
+
+    if CHECK-THE-SIZE of qureg, see if it's really correct
+
+end
+
+include("QuESTbase")
+
+end
+
+################################################################################
+
+module QuESTbase64
+
+const qreal = Float64
+
+function __init__()
+    dlopen("libQuEST64",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+    dlopen(joinpath(@__DIR__,"C","lib_C_QuEST64.so"),
+           RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+
+
+    if CHECK-THE-SIZE of qreal, see if it's really correct
+
+    if CHECK-THE-SIZE of qureg, see if it's really correct
+
+end
+
+include("QuESTbase")
+
+end
 
 ## Misc #-----------------------------------------------------------------------
 #
