@@ -20,7 +20,7 @@ function build(isWindows::Bool)::Nothing
     @info "Build successful."
 end
 
-if !expert && (!ispath("./QuEST") || isempty(readdir("./QuEST")))
+if !expert && (!ispath("QuEST") || isempty(readdir("QuEST")))
 
     if Sys.isunix()
         build(false)
@@ -31,6 +31,3 @@ if !expert && (!ispath("./QuEST") || isempty(readdir("./QuEST")))
     end
 
 end
-
-
-
