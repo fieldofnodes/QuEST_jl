@@ -27,30 +27,32 @@ function _auxBuild(makePrecision ::Int, precision ::String ; isWindows ::Bool) :
 
     if isWindows
         run(`cmake -DPRECISION=$makePrecision .. -G "MinGW Makefiles"`; wait=true)
-        libclang_include = joinpath("..","QuEST","include") |> normpath
-        libclang_headers = [ joinpath(libclang_include,header)   for header in readdir(libclang_include) if endswith(header, ".h")]
-        wc = init(; headers = libclang_headers,
-                  output_file = joinpath(@__DIR__, "libclang_api.jl"),
-                  common_file = joinpath(@__DIR__, "libclang_common.jl"),
-                  clang_includes = vcat(libclang_include, CLANG_INCLUDE),
-                  clang_args = ["-I", joinpath(libclang_include, ".."), "-DQuEST_PREC=$(makePrecision)"],
+
+        questclang_include = joinpath("..","QuEST","include") |> normpath
+        questclang_headers = [ joinpath(questclang_include,header)   for header in readdir(questclang_include) if endswith(header, ".h")]
+        wc = init(; headers = questclang_headers,
+                  output_file = joinpath(@__DIR__, "questclang_out.jl"),
+                  common_file = joinpath(@__DIR__, "questclang_common.jl"),
+                  clang_includes = vcat(questclang_include, CLANG_INCLUDE),
+                  clang_args = ["-I", joinpath(questclang_include, ".."), "-DQuEST_PREC=$(makePrecision)"],
                   header_wrapped = (root, current)->root == current,
-                  header_library = x->"libclang",
+                  header_library = x->"questclang",
                   clang_diagnostics = true,
                   )
         run(wc)
 
     else
         run(`cmake -DPRECISION=$makePrecision ..` ; wait=true)
-        libclang_include = joinpath("..","QuEST","include") |> normpath
-        libclang_headers = [ joinpath(libclang_include,header)   for header in readdir(libclang_include) if endswith(header, ".h")]
-        wc = init(; headers = libclang_headers,
-                  output_file = joinpath(@__DIR__, "libclang_api.jl"),
-                  common_file = joinpath(@__DIR__, "libclang_common.jl"),
-                  clang_includes = vcat(libclang_include, CLANG_INCLUDE),
-                  clang_args = ["-I", joinpath(libclang_include, ".."), "-DQuEST_PREC=$(makePrecision)"],
+
+        questclang_include = joinpath("..","QuEST","include") |> normpath
+        questclang_headers = [ joinpath(questclang_include,header)   for header in readdir(questclang_include) if endswith(header, ".h")]
+        wc = init(; headers = questclang_headers,
+                  output_file = joinpath(@__DIR__, "questclang_api.jl"),
+                  common_file = joinpath(@__DIR__, "questclang_common.jl"),
+                  clang_includes = vcat(questclang_include, CLANG_INCLUDE),
+                  clang_args = ["-I", joinpath(questclang_include, ".."), "-DQuEST_PREC=$(makePrecision)"],
                   header_wrapped = (root, current)->root == current,
-                  header_library = x->"libclang",
+                  header_library = x->"questclang",
                   clang_diagnostics = true,
                   )
         run(wc)
