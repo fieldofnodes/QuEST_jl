@@ -27,7 +27,7 @@ if !expert && (!ispath("./QuEST") || isempty(readdir("./QuEST")))
     elseif Sys.iswindows()
         build(true)
     else
-        error("Architecture/OS not supported.")
+        error("OS not supported.")
     end
 
 end
