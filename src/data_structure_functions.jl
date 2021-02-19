@@ -1,6 +1,20 @@
 # QuEST_jl/src/base/data_structure_functions.jl
 #
 
+import .._QUEST_LIB
+
+function createQuESTEnv() :: QuEST_Types.QuESTEnv
+    if _QUEST_LIB[]==Ptr{Cvoid}(0)
+        QuEST_init()
+    else
+        @assert 4*ccall(:getQuEST_PREC,Cint,(),) == sizeof(Qreal)
+    end
+
+    return ccall(:createQuESTEnv, QuEST_Types.QuESTEnv, () )
+end
+
+####################################################################################################
+
 function createCloneQureg(qureg ::QuEST_Types.Qureg, env ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
     return ccall(:createCloneQureg, QuEST_Types.Qureg, (QuEST_Types.Qureg,QuEST_Types.QuESTEnv), qureg, env)
 end
@@ -29,10 +43,6 @@ end
 
 function createPauliHamilFromFile(fn        ::String)   :: QuEST_Types.PauliHamil
     return ccall(:createPauliHamilFromFile, QuEST_Types.PauliHamil, (Cstring,), fn)
-end
-
-function createQuESTEnv() :: QuEST_Types.QuESTEnv
-    return ccall(:createQuESTEnv, QuEST_Types.QuESTEnv, () )
 end
 
 function createQureg(numQubits ::Integer, env ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg

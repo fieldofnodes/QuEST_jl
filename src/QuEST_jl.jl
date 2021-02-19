@@ -1,4 +1,4 @@
-# QuEST.jl/src/QuEST.jl
+# QuEST.jl/src/QuEST_jl.jl
 #
 # Authors:
 #  - Dirk Oliver Theis, Ketita Labs & Uni Tartu
@@ -28,6 +28,47 @@
 #
 module QuEST_jl
 
+export QuEST32, QuEST64
+
+
+module _QuEST_jl_Build_Setup
+
+    include(joinpath("..","deps","build_setup.jl"))
+
+end #^ module _QuEST_jl_Build_Setup
+
+using Libdl: dlopen, dlclose, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
+
+const _QUEST_LIB = Ref{Ptr{Cvoid}}(0)
+
+"""
+Function `_dlopen_QuEST()` — loads QuEST dll, returns precision code.
+"""
+function _dlopen_QuEST(num::Int) ::Cint
+    @assert num ∈ [32,64]
+    let numstr = string(num)
+
+        if _QuEST_jl_Build_Setup.EXPERT_BUILD
+            global _QUEST_LIB[] =
+                dlopen("libQuEST_"*numstr,
+                       RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+        else
+            global _QUEST_LIB[] =
+                dlopen(joinpath(@__DIR__,"..","deps","QuEST","build"*numstr,"QuEST","libQuEST"),
+                       RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
+        end
+
+    end #^ let
+
+    return ccall(:getQuEST_PREC , Cint, (),)
+end #^ fn _dlopen_QuEST
+
+function _dlclose_QuEST() ::Nothing
+    dlclose(_QUEST_LIB[])
+    _QUEST_LIB[] = 0
+    nothing;
+end
+
 ################################################################################
 # 32 bit QuEST
 ################################################################################
@@ -36,103 +77,91 @@ module QuEST_jl
 Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating point precision.
 """
 module QuEST32
-using Libdl: dlopen, dlclose, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
+export QuEST_Types
 
-"""
-Function `QuEST𝑥𝑦_init()` — initializes 𝑥𝑦-bit QuEST module
-"""
-function QuEST32_init()
-    lib = dlopen("libQuEST32.so",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-    prec = ccall(:getQuEST_PREC , Cint, (),)
+import .._dlopen_QuEST
+
+function QuEST_init() ::Nothing
+    prec = _dlopen_QuEST(32)
     @assert prec == 1 "Wrong precision. Please rebuild the package"
-    return lib
-end
-
-function prec__32_close(lib)  # unused
-    dlclose(lib)
 end
 
 module QuEST_Types  # 32 bit qreal
-using CEnum
+    using CEnum
 
-const MPI_FLOAT  = Cfloat   # This is needed, because ...
-const MPI_DOUBLE = Cdouble  # ...
+    const MPI_FLOAT  = Cfloat   # This is needed, because ...
+    const MPI_DOUBLE = Cdouble  # ...
 
-include("../deps/questclang_common_32.jl")
+    include(joinpath("..","deps","questclang_common_32.jl"))
 
-@assert sizeof(Float32)==sizeof(qreal)
 end #^ module QuEST_Types
+
 const Qreal = Float32
+@assert sizeof(Qreal)==sizeof(QuEST_Types.qreal)
 
 #
-# Include C-wrappers, with correct data types
+# Include C-wrappers, which will use the correct data types
 #
 
 using .QuEST_Types
 
-include("base/data_structure_functions.jl")
-include("base/QASM_logging.jl")
-include("base/debugging.jl")
-include("base/operators.jl")
-include("base/decoherence.jl")
-include("base/state_init.jl")
-include("base/unitaries.jl")
-include("base/calculations.jl")
-include("base/gates.jl")
+include("data_structure_functions.jl")
+include("QASM_logging.jl")
+include("debugging.jl")
+include("operators.jl")
+include("decoherence.jl")
+include("state_init.jl")
+include("unitaries.jl")
+include("calculations.jl")
+include("gates.jl")
 
 end #^ module QuEST32
 
 ################################################################################
-# 32 bit QuEST
+# 64 bit QuEST
 ################################################################################
 
 """
 Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating point precision.
 """
 module QuEST64
-using Libdl: dlopen, dlclose, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
+export QuEST_Types
 
-"""
-Function `QuEST𝑥𝑦_init()` — initializes 𝑥𝑦-bit QuEST module
-"""
-function QuEST64_init()
-    lib = dlopen("libQuEST64.so",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-    prec = ccall(:getQuEST_PREC , Cint, (),)
+import .._dlopen_QuEST
+
+function QuEST_init() ::Nothing
+    prec = _dlopen_QuEST(64)
     @assert prec == 2 "Wrong precision. Please rebuild the package"
-    return lib
-end
-
-function prec__64_close(lib)
-    dlclose(lib)
 end
 
 module QuEST_Types  # 64 bit qreal
-using CEnum
+    using CEnum
 
-const MPI_FLOAT  = Cfloat   # This is needed, because ...
-const MPI_DOUBLE = Cdouble  # ...
+    const MPI_FLOAT  = Cfloat   # This is needed, because ...
+    const MPI_DOUBLE = Cdouble  # ...
 
-include("../deps/questclang_common_64.jl")
+    include(joinpath("..","deps","questclang_common_64.jl"))
 
-@assert sizeof(Float64)==sizeof(qreal)
 end #^ module QuEST_Types
+
 const Qreal = Float64
+@assert sizeof(Qreal)==sizeof(QuEST_Types.qreal)
 
 #
-# Include C-wrappers, with correct data types
+# Include C-wrappers, which will use the correct data types
 #
 
 using .QuEST_Types
 
-include("base/data_structure_functions.jl")
-include("base/QASM_logging.jl")
-include("base/debugging.jl")
-include("base/operators.jl")
-include("base/decoherence.jl")
-include("base/state_init.jl")
-include("base/unitaries.jl")
-include("base/calculations.jl")
-include("base/gates.jl")
+include("data_structure_functions.jl")
+include("QASM_logging.jl")
+include("debugging.jl")
+include("operators.jl")
+include("decoherence.jl")
+include("state_init.jl")
+include("unitaries.jl")
+include("calculations.jl")
+include("gates.jl")
 
 end #^ module QuEST64
 

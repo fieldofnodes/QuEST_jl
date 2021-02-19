@@ -13,7 +13,7 @@ using Clang.LibClang.Clang_jll
 """
 True, if expert installation has been selected
 """
-const EXPERT = haskey(ENV, "QUEST_EXPERT") # && ENV["QUEST_EXPERT"] == "1" ? true : false
+const EXPERT_BUILD = haskey(ENV, "QUEST_JL_EXPERT_BUILD")
 
 """
 Execute commands to build QuEST
@@ -76,13 +76,14 @@ function build(;isWindows::Bool) ::Nothing
     @info "Build with 64-bit floats..."
     _auxBuild(2,"64" ; isWindows)
     @info "Builds successful."
+    cd("..")
 end
 
 #
 # File "main" section
 #
 
-if EXPERT
+if EXPERT_BUILD
     @warn "Expert installation: Make sure the libraries `libQuEST_32` and `libQuEST_64` are loadable."
 else
     @warn "Non-expert installation: Downloading QuEST and building it with default settings"
@@ -99,5 +100,10 @@ else
         error("OS not supported.")
     end
 end #^ else
+
+open("build_setup.jl", "w") do f
+    write(f,
+          "const EXPERT_BUILD = Bool($(EXPERT_BUILD))\n")
+end
 
 #EOF
