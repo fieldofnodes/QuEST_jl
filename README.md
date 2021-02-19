@@ -18,7 +18,7 @@ Download and build the Julia package like this:
 
 ```{julia}
 ] add QuEST_jl
-'''
+```
 
 QuEST is automatically cloned from GitHub (from this fork:
 https://github.com/Ketita/QuEST) to your Julia packages folder, and
