@@ -1,98 +1,101 @@
-function cloneQureg(targetQureg ::Qureg, copyQureg ::Qureg) ::Nothing
-    
-    return ccall(:createCloneQureg, Cvoid, (Qureg, Qureg), targetQureg, copyQureg)
+# QuEST_jl/src/base/state_init.jl
+#
+
+function cloneQureg(targetQureg ::QuEST_Types.Qureg, copyQureg ::QuEST_Types.Qureg) ::Nothing
+
+    return ccall(:createCloneQureg, Cvoid, (QuEST_Types.Qureg, QuEST_Types.Qureg), targetQureg, copyQureg)
 
 end
 
-function initBlankState(qureg ::Qureg) ::Nothing
+function initBlankState(qureg ::QuEST_Types.Qureg) ::Nothing
 
-    ccall(:initBlankState, Cvoid, (Qureg,), qureg)
+    ccall(:initBlankState, Cvoid, (QuEST_Types.Qureg,), qureg)
     return nothing
 
 end
 
-function initClassicalState(qureg ::Qureg, stateInd ::T where T<:Integer) ::Nothing
+function initClassicalState(qureg ::QuEST_Types.Qureg, stateInd ::T where T<:Integer) ::Nothing
 
-    ccall(:initClassicalState, Cvoid, (Qureg,Clonglong), qureg, Clonglong(stateInd))
+    ccall(:initClassicalState, Cvoid, (QuEST_Types.Qureg,Clonglong), qureg, Clonglong(stateInd))
     return nothing
-    
+
 end
 
-function initPlusState(qureg ::Qureg) ::Nothing
-        
-    ccall(:initPlusState, Cvoid, (Qureg,), qureg)   
-    return nothing
-    
-end     
+function initPlusState(qureg ::QuEST_Types.Qureg) ::Nothing
 
-function initPureState(qureg ::Qureg, pure ::Qureg) ::Nothing
-
-    ccall(:initPureState, Cvoid, (Qureg,Qureg), qureg,pure)
+    ccall(:initPlusState, Cvoid, (QuEST_Types.Qureg,), qureg)
     return nothing
-    
+
 end
 
-function initStateFromAmps(qureg ::Qureg,
-                           amps ::Base.Vector{Base.Complex{Qreal}}) ::Nothing
+function initPureState(qureg ::QuEST_Types.Qureg, pure ::QuEST_Types.Qureg) ::Nothing
 
-    reals = Base.Vector{Qreal}([real(x) for x in amps])
-    imags = Base.Vector{Qreal}([imag(x) for x in amps])
+    ccall(:initPureState, Cvoid, (QuEST_Types.Qureg,QuEST_Types.Qureg), qureg,pure)
+    return nothing
 
-    ccall(:initStateFromAmps, 
-          Cvoid, 
-          (Qureg, Ptr{Qreal}, Ptr{Qreal}), 
-          qureg, 
-          reals, 
+end
+
+function initStateFromAmps(qureg ::QuEST_Types.Qureg,
+                           amps ::Vector{Complex{Qreal}}) ::Nothing
+
+    reals = Vector{Qreal}([real(x) for x in amps])
+    imags = Vector{Qreal}([imag(x) for x in amps])
+
+    ccall(:initStateFromAmps,
+          Cvoid,
+          (QuEST_Types.Qureg, Ptr{Qreal}, Ptr{Qreal}),
+          qureg,
+          reals,
           imags)
 
     return nothing
 
 end
 
-function initZeroState(qureg ::Qureg) ::Nothing
+function initZeroState(qureg ::QuEST_Types.Qureg) ::Nothing
 
-    ccall(:initZeroState, Cvoid, (Qureg,), qureg)
+    ccall(:initZeroState, Cvoid, (QuEST_Types.Qureg,), qureg)
     return nothing
-    
+
 end
 
-function setAmps(qureg                  ::Qureg,
+function setAmps(qureg                  ::QuEST_Types.Qureg,
                  startIdx               ::T where T<:Integer,
-                 amps                   ::Base.Vector{Base.Complex{Qreal}},
+                 amps                   ::Vector{Complex{Qreal}},
                  numAmps                ::T where T<:Integer)          :: Nothing
 
     @assert length(amps) == numAmps
     @assert numAmps + startIdx <= qureg.numQubitsInStateVec
-    reals = Base.Vector{Qreal}([real(x) for x in amps])
-    imags = Base.Vector{Qreal}([imag(x) for x in amps])
+    reals = Vector{Qreal}([real(x) for x in amps])
+    imags = Vector{Qreal}([imag(x) for x in amps])
 
 
-    ccall(:setAmps, 
-          Cvoid, 
-          (Qureg, Clonglong, Ptr{Qreal}, Ptr{Qreal}, Clonglong), 
-          qureg,  
-          Clonglong(startIdx),  
-          reals, 
-          imags, 
+    ccall(:setAmps,
+          Cvoid,
+          (QuEST_Types.Qureg, Clonglong, Ptr{Qreal}, Ptr{Qreal}, Clonglong),
+          qureg,
+          Clonglong(startIdx),
+          reals,
+          imags,
           Clonglong(numAmps))
 return nothing
 end
 
-function setWeightedQureg(fac1   ::Base.Complex{Qreal},   
-                          qureg1 ::Qureg,
-                          fac2   ::Base.Complex{Qreal},   
-                          qureg2 ::Qureg,
-                          facOut ::Base.Complex{Qreal},   
-                          out    ::Qureg)           ::Nothing
+function setWeightedQureg(fac1   ::Complex{Qreal},
+                          qureg1 ::QuEST_Types.Qureg,
+                          fac2   ::Complex{Qreal},
+                          qureg2 ::QuEST_Types.Qureg,
+                          facOut ::Complex{Qreal},
+                          out    ::QuEST_Types.Qureg)           ::Nothing
 
     ccall(:setWeightedQureg,
           Cvoid,
-          (QuEST_types.Complex, Qureg, QuEST_types.Complex, Qureg, QuEST_types.Complex, Qureg),
-          QuEST_types.Complex(Qreal(real(fac1)),Qreal(real(fac1))), 
+          (QuEST_Types.Complex, QuEST_Types.Qureg, QuEST_Types.Complex, QuEST_Types.Qureg, QuEST_Types.Complex, QuEST_Types.Qureg),
+          QuEST_Types.Complex(Qreal(real(fac1)),Qreal(real(fac1))),
           qureg1,
-          QuEST_types.Complex(Qreal(real(fac2)),Qreal(real(fac2))), 
+          QuEST_Types.Complex(Qreal(real(fac2)),Qreal(real(fac2))),
           qureg2,
-          QuEST_types.Complex(Qreal(real(facOut)),Qreal(real(facOut))), 
+          QuEST_Types.Complex(Qreal(real(facOut)),Qreal(real(facOut))),
           out)
 
     return nothing

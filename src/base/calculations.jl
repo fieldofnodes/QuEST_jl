@@ -1,175 +1,180 @@
-function calcDensityInnerProduct(ϱ1 ::Qureg, ϱ2 ::Qureg) ::Qreal
+# QuEST_jl/src/base/calculations.jl
+#
 
-    w = ccall(:calcDensityInnerProduct, 
-              Qreal, 
-              (Qureg, Qureg), 
-              ϱ1, 
+function calcDensityInnerProduct(ϱ1 ::QuEST_Types.Qureg, ϱ2 ::QuEST_Types.Qureg) ::Qreal
+
+    w = ccall(:calcDensityInnerProduct,
+              Qreal,
+              (QuEST_Types.Qureg, QuEST_Types.Qureg),
+              ϱ1,
               ϱ2)
 
     return Qreal(w)
 end
 
-function calcExpecDiagonalOp(qureg      ::Qureg, op         ::DiagonalOp)  ::QuEST_types.Complex
+function calcExpecDiagonalOp(qureg      ::QuEST_Types.Qureg, op         ::QuEST_Types.DiagonalOp)  ::QuEST_Types.Complex
 
     ret= ccall(:calcExpecDiagonalOp,
-               QuEST_types.Complex,
-               (Qureg, DiagonalOp),
+               QuEST_Types.Complex,
+               (QuEST_Types.Qureg, QuEST_Types.DiagonalOp),
                qureg,
                op)
-     
+
     return ret
 end
 
-function calcExpecPauliHamil(qureg           ::Qureg,
-                             hamil           ::PauliHamil,
-                             workspace       ::Qureg)       Qreal
+function calcExpecPauliHamil(qureg           ::QuEST_Types.Qureg,
+                             hamil           ::QuEST_Types.PauliHamil,
+                             workspace       ::QuEST_Types.Qureg)       Qreal
 
-    ret = ccall(:calcExpecPauliHamil, Qreal, (Qureg, PauliHamil, Qureg), qureg, hamil, workspace)
-    
+    ret = ccall(:calcExpecPauliHamil, Qreal, (QuEST_Types.Qureg, QuEST_Types.PauliHamil, QuEST_Types.Qureg), qureg, hamil, workspace)
+
     return ret
 
 end
 
-function calcExpecPauliProd(qureg        ::Qureg,
-                            targetQubits ::Base.Vector{Cint},
-                            pauliCodes   ::Base.Vector{pauliOpType},
-                            workspace    ::Qureg)          ::Qreal
+function calcExpecPauliProd(qureg        ::QuEST_Types.Qureg,
+                            targetQubits ::Vector{Cint},
+                            pauliCodes   ::Vector{QuEST_Types.pauliOpType},
+                            workspace    ::QuEST_Types.Qureg)          ::Qreal
 
     @assert length(targetQubits) == length(pauliCodes)
     @assert all( σ -> 0 ≤ σ ≤ 3,   pauliCodes )
 
-    expval = ccall(:calcExpecPauliProd, 
-                   Qreal, 
-                   (Qureg, Ptr{Cint}, Ptr{pauliOpType}, Cint, Qureg), 
-                   qureg, 
-                   targetQubits, 
-                   pauliCodes, 
-                   Cint(length(targetQubits)), 
+    expval = ccall(:calcExpecPauliProd,
+                   Qreal,
+                   (QuEST_Types.Qureg, Ptr{Cint}, Ptr{QuEST_Types.pauliOpType}, Cint, QuEST_Types.Qureg),
+                   qureg,
+                   targetQubits,
+                   pauliCodes,
+                   Cint(length(targetQubits)),
                    workspace)
 
     return expval
 end
 
-function calcExpecPauliSum(qureg         ::Qureg,
-                           allPauliCodes ::Base.Vector{pauliOpType},
-                           termCoeffs    ::Base.Vector{Qreal},
-                           workspace     ::Qureg)          ::Float64
+function calcExpecPauliSum(qureg         ::QuEST_Types.Qureg,
+                           allPauliCodes ::Vector{QuEST_Types.pauliOpType},
+                           termCoeffs    ::Vector{Qreal},
+                           workspace     ::QuEST_Types.Qureg)          ::Float64
 
     @assert length(allPauliCodes) ==  length(termCoeffs) * getNumQubits(qureg)
     @assert all( σ -> 0 ≤ σ ≤ 3,  allPauliCodes )
 
-    ex = ccall(:calcExpecPauliSum, 
-               Qreal, 
-               (Qureg, Ptr{pauliOpType}, Ptr{Qreal}, Cint, Qureg), 
-               qureg, 
-               allPauliCodes, 
-               termCoeffs, 
-               Cint(length(termCoeffs)), 
+    ex = ccall(:calcExpecPauliSum,
+               Qreal,
+               (QuEST_Types.Qureg, Ptr{QuEST_Types.pauliOpType}, Ptr{Qreal}, Cint, QuEST_Types.Qureg),
+               qureg,
+               allPauliCodes,
+               termCoeffs,
+               Cint(length(termCoeffs)),
                workspace)
 
     return ex
 
 end
 
-function calcFidelity(qureg ::Qureg, pureState ::Qureg) ::Qreal
+function calcFidelity(qureg ::QuEST_Types.Qureg, pureState ::QuEST_Types.Qureg) ::Qreal
 
-    fi = ccall(:calcFidelity, Qreal, (Qureg, Qureg), qureg, pureState)
+    fi = ccall(:calcFidelity, Qreal, (QuEST_Types.Qureg, QuEST_Types.Qureg), qureg, pureState)
     return fi
 
 end
-    
-function calcHilbertSchmidtDistance(a ::Qureg, b ::Qureg) ::Qreal
 
-    hsd = ccall(:calcHilbertSchmidtDistance, Qreal, (Qureg, Qureg), a, b)
+function calcHilbertSchmidtDistance(a ::QuEST_Types.Qureg, b ::QuEST_Types.Qureg) ::Qreal
+
+    hsd = ccall(:calcHilbertSchmidtDistance, Qreal, (QuEST_Types.Qureg, QuEST_Types.Qureg), a, b)
     return hsd
-    
+
 end
 
-function calcInnerProduct(bra ::Qureg, ket ::Qureg) ::Base.Complex{Qreal}
+function calcInnerProduct(bra ::QuEST_Types.Qureg, ket ::QuEST_Types.Qureg) ::Complex{Qreal}
 
-    w = ccall(:calcInnerProduct, QuEST_types.Complex, (Qureg, Qureg), bra, ket)
-    return Base.Complex{Qreal}(w.real,w.imag)
-    
+    w = ccall(:calcInnerProduct, QuEST_Types.Complex, (QuEST_Types.Qureg, QuEST_Types.Qureg), bra, ket)
+    return Complex{Qreal}(w.real,w.imag)
+
 end
 
-function calcProbOfOutcome(qureg        ::Qureg,
+function calcProbOfOutcome(qureg        ::QuEST_Types.Qureg,
     measureQubit ::T where T<:Integer,
     outcome      ::T where T<:Integer)   ::Qreal
 
-p = ccall(:calcProbOfOutcome, 
-Qreal, 
-(Qureg, Cint, Cint), 
-qureg, 
-Cint(measureQubit), 
+p = ccall(:calcProbOfOutcome,
+Qreal,
+(QuEST_Types.Qureg, Cint, Cint),
+qureg,
+Cint(measureQubit),
 Cint(outcome))
 
 return p
 
 end
 
-function calcPurity(qureg ::Qureg) ::Qreal
+function calcPurity(qureg ::QuEST_Types.Qureg) ::Qreal
 
-    pu = ccall(:calcPurity, Qreal, (Qureg,), qureg)
+    pu = ccall(:calcPurity, Qreal, (QuEST_Types.Qureg,), qureg)
     return pu
-    
+
 end
 
-function calcTotalProb(qureg ::Qureg) ::Qreal
-        
-    one = ccall(:calcTotalProb, Qreal, (Qureg,), qureg)
+function calcTotalProb(qureg ::QuEST_Types.Qureg) ::Qreal
+
+    one = ccall(:calcTotalProb, Qreal, (QuEST_Types.Qureg,), qureg)
     return one
-        
+
 end
 
-function getAmp(qureg ::Qureg,  idx ::T where T<:Integer) ::Base.Complex{Qreal}
-        
-    α = ccall(:getAmp, QuEST_types.Complex, (Qureg, Clonglong), qureg, Clonglong(idx))
-    return Base.Complex{Qreal}(α.real,α.imag)
-    
+function getAmp(qureg ::QuEST_Types.Qureg,  idx ::T where T<:Integer) ::Complex{Qreal}
+
+    α = ccall(:getAmp, QuEST_Types.Complex, (QuEST_Types.Qureg, Clonglong), qureg, Clonglong(idx))
+    return Complex{Qreal}(α.real,α.imag)
+
 end
 
-function getDensityAmp(qureg ::Qureg, row ::T where T<:Integer, col ::T where T<:Integer) ::Complex{Qreal}
-        
-    α = ccall(:getDensityAmp, 
-              QuEST_types.Complex, 
-              (Qureg, Clonglong, Clonglong),
-              qureg, 
-              Clonglong(row), 
+function getDensityAmp(qureg ::QuEST_Types.Qureg, row ::T where T<:Integer, col ::T where T<:Integer) ::Complex{Qreal}
+
+    α = ccall(:getDensityAmp,
+              QuEST_Types.Complex,
+              (QuEST_Types.Qureg, Clonglong, Clonglong),
+              qureg,
+              Clonglong(row),
               Clonglong(col))
-    
-    return Base.Complex{Qreal}(α.real, α.imag)
+
+    return Complex{Qreal}(α.real, α.imag)
 
 end
 
-function getImagAmp(qureg       ::Qureg, index      ::T where T<:Integer)      ::Qreal
+function getImagAmp(qureg       ::QuEST_Types.Qureg, index      ::T where T<:Integer)      ::Qreal
 
-    ret = ccall(:getImagAmp, Qreal, (Qureg, Clonglong), qureg, Clonglong(index))
+    ret = ccall(:getImagAmp, Qreal, (QuEST_Types.Qureg, Clonglong), qureg, Clonglong(index))
     return ret
 
 end
 
-function getNumAmps(qureg ::Qureg) ::Clonglong
+function getNumAmps(qureg ::QuEST_Types.Qureg) ::Clonglong
 
-    return ccall(:getNumAmps, Clonglong, (Qureg,), qureg)
-
-end
-
-function getNumQubits(qureg ::Qureg) ::Cint
-
-    return ccall(:getNumQubits, Cint, (Qureg,), qureg)
+    return ccall(:getNumAmps, Clonglong, (QuEST_Types.Qureg,), qureg)
 
 end
 
-function getProbAmp(qureg ::Qureg, idx ::T where T<:Integer) :: Qreal
+function getNumQubits(qureg ::QuEST_Types.Qureg) ::Cint
 
-    p = ccall(:getProbAmp, Qreal, (Qureg, Clonglong), qureg, Clonglong(idx))
+    return ccall(:getNumQubits, Cint, (QuEST_Types.Qureg,), qureg)
+
+end
+
+function getProbAmp(qureg ::QuEST_Types.Qureg, idx ::T where T<:Integer) :: Qreal
+
+    p = ccall(:getProbAmp, Qreal, (QuEST_Types.Qureg, Clonglong), qureg, Clonglong(idx))
     return p
-    
+
 end
 
-function getRealAmp(qureg ::Qureg, idx ::T where T<:Integer) :: Qreal
+function getRealAmp(qureg ::QuEST_Types.Qureg, idx ::T where T<:Integer) :: Qreal
 
-    p = ccall(:getRealAmp, Qreal, (Qureg, Clonglong), qureg, Clonglong(idx))
+    p = ccall(:getRealAmp, Qreal, (QuEST_Types.Qureg, Clonglong), qureg, Clonglong(idx))
     return p
-    
+
 end
+
+#EOF

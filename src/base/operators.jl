@@ -1,110 +1,114 @@
-function applyDiagonalOp(qureg          :: Qureg,
-                         op             :: DiagonalOp)  ::Nothing
+# QuEST_jl/src/base/operators.jl
+#
 
-    ccall(:applyDiagonalOp, Cvoid, (Qureg, DiagonalOp), qureg, op)
-nothing;
+function applyDiagonalOp(qureg          :: QuEST_Types.Qureg,
+                         op             :: QuEST_Types.DiagonalOp)  ::Nothing
+
+    ccall(:applyDiagonalOp, Cvoid, (QuEST_Types.Qureg, QuEST_Types.DiagonalOp), qureg, op)
+    nothing;
 end
 
-function applyMatrix2(qureg             :: Qureg,
+function applyMatrix2(qureg             :: QuEST_Types.Qureg,
     targetQubit       :: T where T<:Integer,
-    u                 :: ComplexMatrix2)  ::Nothing
+    u                 :: QuEST_Types.ComplexMatrix2)  ::Nothing
 
-ccall(:applyMatrix2, Cvoid, (Qureg, Cint, ComplexMatrix2), qureg, Cint(targetQubit), u)
-nothing;
+    ccall(:applyMatrix2, Cvoid, (QuEST_Types.Qureg, Cint, QuEST_Types.ComplexMatrix2), qureg, Cint(targetQubit), u)
+    nothing;
 end
 
-function applyMatrix4(qureg             :: Qureg,
+function applyMatrix4(qureg             :: QuEST_Types.Qureg,
     targetQubit1      :: T where T<:Integer,
     targetQubit2      :: T where T<:Integer,
-    u                 :: ComplexMatrix4)   ::Nothing
+    u                 :: QuEST_Types.ComplexMatrix4)   ::Nothing
 
-ccall(:applyMatrix4, 
-Cvoid, 
-(Qureg, Cint, Cint, ComplexMatrix4), 
-qureg, 
-Cint(targetQubit1), 
-Cint(targetQubit2), 
-u)
-return nothing
+    ccall(:applyMatrix4,
+          Cvoid,
+          (QuEST_Types.Qureg, Cint, Cint, QuEST_Types.ComplexMatrix4),
+          qureg,
+          Cint(targetQubit1),
+          Cint(targetQubit2),
+          u)
+    return nothing
 end
 
-function applyMatrixN(qureg             :: Qureg,
-                     targs             :: Base.Vector{Cint},
+function applyMatrixN(qureg             :: QuEST_Types.Qureg,
+                     targs             :: Vector{Cint},
                      numTargs          ::  T where T<:Integer,
-                     u                 :: ComplexMatrixN)   ::Nothing
+                     u                 :: QuEST_Types.ComplexMatrixN)   ::Nothing
 
-    ccall(:applyMatrixN, 
-          Cvoid, 
-          (Qureg, Ptr{Cint}, Cint, ComplexMatrixN), 
-          qureg, 
-          targs, 
-          Cint(numTargs), 
+    ccall(:applyMatrixN,
+          Cvoid,
+          (QuEST_Types.Qureg, Ptr{Cint}, Cint, QuEST_Types.ComplexMatrixN),
+          qureg,
+          targs,
+          Cint(numTargs),
           u)
 
     return nothing
 end
 
-function applyMultiControlledMatrixN(qureg          :: Qureg,
-    ctrls          :: Base.Vector{T} where T<:Integer,
+function applyMultiControlledMatrixN(qureg          :: QuEST_Types.Qureg,
+    ctrls          :: Vector{T} where T<:Integer,
     numCtrls       :: T where T<:Integer,
-    targs          :: Base.Vector{T} where T<:Integer,
+    targs          :: Vector{T} where T<:Integer,
     numTargs       :: T where T<:Integer,
-    u              :: ComplexMatrixN)  ::Nothing
+    u              :: QuEST_Types.ComplexMatrixN)  ::Nothing
 
-ccall(:applyMultiControlledMatrixN, 
-Cvoid, 
-(Qureg, Ptr{Cint}, Cint, Ptr{Cint}, Cint, ComplexMatrixN),
-qureg,
-Cint.(ctrls),
-Cint(numCtrls),
-Cint(targs),
-Cint(numTargs),
-u)
-nothing;
+    ccall(:applyMultiControlledMatrixN,
+          Cvoid,
+          (QuEST_Types.Qureg, Ptr{Cint}, Cint, Ptr{Cint}, Cint, QuEST_Types.ComplexMatrixN),
+          qureg,
+          Cint.(ctrls),
+          Cint(numCtrls),
+          Cint(targs),
+          Cint(numTargs),
+          u)
+    nothing;
 end
 
-function applyPauliHamil(inQureg        :: Qureg,
-                         hamil          :: PauliHamil,
-                         outQureg       :: Qureg)  ::Nothing
+function applyPauliHamil(inQureg        :: QuEST_Types.Qureg,
+                         hamil          :: QuEST_Types.PauliHamil,
+                         outQureg       :: QuEST_Types.Qureg)  ::Nothing
 
-    ccall(:applyPauliHamil, Cvoid, (Qureg, PauliHamil, Qureg), inQureg, hamil, outQureg)
-nothing;
+    ccall(:applyPauliHamil, Cvoid, (QuEST_Types.Qureg, QuEST_Types.PauliHamil, QuEST_Types.Qureg), inQureg, hamil, outQureg)
+    nothing;
 end
 
-function applyPauliSum(inQureg        ::Qureg,
-                       allPauliCodes  ::Base.Vector{pauliOpType},
-                       termCoeffs     ::Base.Vector{Qreal},
+function applyPauliSum(inQureg        ::QuEST_Types.Qureg,
+                       allPauliCodes  ::Vector{QuEST_Types.pauliOpType},
+                       termCoeffs     ::Vector{Qreal},
                        numSumTerms    ::T where T<:Integer,
-                       outQureg       ::Qureg)          ::Nothing
+                       outQureg       ::QuEST_Types.Qureg)          ::Nothing
 
     @assert length(termCoeffs) == numSumTerms * getNumQubits(inQureg)
 
-    ccall(:applyPauliSum, 
-          Cvoid, 
-          (Qureg, Ptr{pauliOpType}, Ptr{Qreal}, Cint, Qureg),
-          inQureg, 
-          allPauliCodes, 
-          termCoeffs, 
-          Cint(numSumTerms), 
+    ccall(:applyPauliSum,
+          Cvoid,
+          (QuEST_Types.Qureg, Ptr{QuEST_Types.pauliOpType}, Ptr{Qreal}, Cint, QuEST_Types.Qureg),
+          inQureg,
+          allPauliCodes,
+          termCoeffs,
+          Cint(numSumTerms),
           outQureg)
 
     return nothing
 end
 
-function applyTrotterCircuit(qureg          :: Qureg,
-    hamil          :: PauliHamil,
+function applyTrotterCircuit(qureg          :: QuEST_Types.Qureg,
+    hamil          :: QuEST_Types.PauliHamil,
     time           :: Qreal,
     order          :: T where T<:Integer,
     reps           :: T where T<:Integer)  ::Nothing
 
-ccall(:applyTrotterCircuit, 
-Cvoid, 
-(Qureg, PauliHamil, Qreal, Cint, Cint),
-qureg,
-hamil,
-time,
-Cint(order),
-Cint(reps))
-
-return nothing
+    ccall(:applyTrotterCircuit,
+          Cvoid,
+          (QuEST_Types.Qureg, QuEST_Types.PauliHamil, Qreal, Cint, Cint),
+          qureg,
+          hamil,
+          time,
+          Cint(order),
+          Cint(reps))
+    return nothing
 end
+
+#EOF

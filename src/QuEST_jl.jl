@@ -26,7 +26,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-module QuESTjl
+module QuEST_jl
 
 ################################################################################
 # 32 bit QuEST
@@ -37,7 +37,6 @@ Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating po
 """
 module QuEST32
 using Libdl: dlopen, dlclose, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
-const Qreal = Float32
 
 """
 Function `QuEST𝑥𝑦_init()` — initializes 𝑥𝑦-bit QuEST module
@@ -53,22 +52,23 @@ function prec__32_close(lib)  # unused
     dlclose(lib)
 end
 
-module QuEST_types  # 32 bit qreal
+module QuEST_Types  # 32 bit qreal
 using CEnum
 
-const MPI_DOUBLE = Cdouble  # This is needed, because ....
+const MPI_FLOAT  = Cfloat   # This is needed, because ...
+const MPI_DOUBLE = Cdouble  # ...
 
 include("../deps/questclang_common_32.jl")
 
-@assert sizeof(Qreal)==sizeof(qreal)
-
-end # QuEST_types
+@assert sizeof(Float32)==sizeof(qreal)
+end #^ module QuEST_Types
+const Qreal = Float32
 
 #
 # Include C-wrappers, with correct data types
 #
 
-using .QuEST_types
+using .QuEST_Types
 
 include("base/data_structure_functions.jl")
 include("base/QASM_logging.jl")
@@ -91,7 +91,6 @@ Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating po
 """
 module QuEST64
 using Libdl: dlopen, dlclose, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
-const Qreal = Float64
 
 """
 Function `QuEST𝑥𝑦_init()` — initializes 𝑥𝑦-bit QuEST module
@@ -107,22 +106,23 @@ function prec__64_close(lib)
     dlclose(lib)
 end
 
-module QuEST_types  # 64 bit qreal
+module QuEST_Types  # 64 bit qreal
 using CEnum
 
-const MPI_DOUBLE = Cdouble
+const MPI_FLOAT  = Cfloat   # This is needed, because ...
+const MPI_DOUBLE = Cdouble  # ...
 
 include("../deps/questclang_common_64.jl")
 
-@assert sizeof(Qreal)==sizeof(qreal)
-
-end # QuEST_types
+@assert sizeof(Float64)==sizeof(qreal)
+end #^ module QuEST_Types
+const Qreal = Float64
 
 #
 # Include C-wrappers, with correct data types
 #
 
-using .QuEST_types
+using .QuEST_Types
 
 include("base/data_structure_functions.jl")
 include("base/QASM_logging.jl")
@@ -136,5 +136,5 @@ include("base/gates.jl")
 
 end #^ module QuEST64
 
-end # module QuESTjl
+end # module QuEST_jl
 # EOF
