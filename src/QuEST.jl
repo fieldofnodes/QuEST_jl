@@ -1,13 +1,10 @@
 # QuEST.jl/src/QuEST.jl
 #
 # Authors:
-#  - Dirk Oliver Theis, Ketita Labs
-#
-# Copyright (c) 2020 Ketita Labs oü, Tartu, Estonia
+#  - Dirk Oliver Theis, Ketita Labs & Uni Tartu
+#  - Bahman Ghandchi, Uni Tartu
 #
 # MIT License
-#
-# Copyright (c) 2020 Ketita Labs oü, Tartu, Estonia
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation files
@@ -28,57 +25,51 @@
 # ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-module QuEST
-
-#include("./_QuEST_Internals.jl")
-#include("./_C_QuEST.jl")
-
-#import _C_QuEST: numQubits, isDensityMatrix # ...
-#export numQubits, isDensityMatrix
-
-export prec_32__init__
-export prec_64__init__
+#
+module QuESTjl
 
 ################################################################################
+# 32 bit QuEST
+################################################################################
 
-module QuESTbase32
+"""
+Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating point precision.
+"""
+module QuEST32
 using Libdl: dlopen, dlclose, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
-const Qreal = Cfloat
+const Qreal = Float32
 
-export prec_32__init__
-
-function prec_32__init__()
+"""
+Function `QuEST𝑥𝑦_init()` — initializes 𝑥𝑦-bit QuEST module
+"""
+function QuEST32_init()
     lib = dlopen("libQuEST32.so",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-    #dlopen(joinpath(@__DIR__,"C","lib_C_QuEST32.so"), RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-
     prec = ccall(:getQuEST_PREC , Cint, (),)
-
     @assert prec == 1 "Wrong precision. Please rebuild the package"
-
     return lib
-
 end
 
-function prec__32_close(lib)
+function prec__32_close(lib)  # unused
     dlclose(lib)
 end
 
-#include("base/data_structures.jl")
-module QuEST_types
+module QuEST_types  # 32 bit qreal
 using CEnum
-import ..Qreal
-export QASMLogger, ComplexMatrix2, ComplexArray, ComplexMatrix4, 
-       ComplexMatrixN, DiagonalOp, PauliHamil, QuESTEnv, Qureg, pauliOpType
 
+const MPI_DOUBLE = Cdouble  # This is needed, because ....
 
-const MPI_DOUBLE = Cdouble
+include("../deps/questclang_common_32.jl")
 
-include("./libclang_common_32.jl")
-
+@assert sizeof(Qreal)==sizeof(qreal)
 
 end # QuEST_types
 
+#
+# Include C-wrappers, with correct data types
+#
+
 using .QuEST_types
+
 include("base/data_structure_functions.jl")
 include("base/QASM_logging.jl")
 include("base/debugging.jl")
@@ -89,48 +80,50 @@ include("base/unitaries.jl")
 include("base/calculations.jl")
 include("base/gates.jl")
 
-end
+end #^ module QuEST32
 
 ################################################################################
+# 32 bit QuEST
+################################################################################
 
-module QuESTbase64
+"""
+Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating point precision.
+"""
+module QuEST64
 using Libdl: dlopen, dlclose, RTLD_LAZY, RTLD_DEEPBIND, RTLD_GLOBAL
-const Qreal = Cdouble
+const Qreal = Float64
 
-export prec_64__init__
-
-function prec_64__init__()
+"""
+Function `QuEST𝑥𝑦_init()` — initializes 𝑥𝑦-bit QuEST module
+"""
+function QuEST64_init()
     lib = dlopen("libQuEST64.so",RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-    #dlopen(joinpath(@__DIR__,"C","lib_C_QuEST64.so"), RTLD_LAZY|RTLD_DEEPBIND|RTLD_GLOBAL)
-
     prec = ccall(:getQuEST_PREC , Cint, (),)
-
     @assert prec == 2 "Wrong precision. Please rebuild the package"
-
     return lib
-
 end
 
 function prec__64_close(lib)
     dlclose(lib)
 end
 
-#include("base/data_structures.jl")
-module QuEST_types
+module QuEST_types  # 64 bit qreal
 using CEnum
-import ..Qreal
-export QASMLogger, ComplexMatrix2, ComplexArray, ComplexMatrix4, 
-       ComplexMatrixN, DiagonalOp, PauliHamil, QuESTEnv, Qureg, pauliOpType
-
 
 const MPI_DOUBLE = Cdouble
 
-include("./libclang_common_64.jl")
+include("../deps/questclang_common_64.jl")
 
+@assert sizeof(Qreal)==sizeof(qreal)
 
 end # QuEST_types
 
+#
+# Include C-wrappers, with correct data types
+#
+
 using .QuEST_types
+
 include("base/data_structure_functions.jl")
 include("base/QASM_logging.jl")
 include("base/debugging.jl")
@@ -141,7 +134,7 @@ include("base/unitaries.jl")
 include("base/calculations.jl")
 include("base/gates.jl")
 
-end
+end #^ module QuEST64
 
-end # module
+end # module QuESTjl
 # EOF
