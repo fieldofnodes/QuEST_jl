@@ -31,7 +31,7 @@ function _auxBuild(makePrecision ::Int, precision ::String ; isWindows ::Bool) :
         questclang_include = joinpath("..","QuEST","include") |> normpath
         questclang_headers = [ joinpath(questclang_include,header)   for header in readdir(questclang_include) if endswith(header, ".h")]
         wc = init(; headers = questclang_headers,
-                  output_file = joinpath(@__DIR__, "questclang_out_"*precision*".jl"),
+                  output_file = joinpath(@__DIR__, "questclang_api_"*precision*".jl"),
                   common_file = joinpath(@__DIR__, "questclang_common_"*precision*".jl"),
                   clang_includes = vcat(questclang_include, CLANG_INCLUDE),
                   clang_args = ["-I", joinpath(questclang_include, ".."), "-DQuEST_PREC=$(makePrecision)"],
@@ -47,8 +47,8 @@ function _auxBuild(makePrecision ::Int, precision ::String ; isWindows ::Bool) :
         questclang_include = joinpath("..","QuEST","include") |> normpath
         questclang_headers = [ joinpath(questclang_include,header)   for header in readdir(questclang_include) if endswith(header, ".h")]
         wc = init(; headers = questclang_headers,
-                  output_file = joinpath(@__DIR__, "questclang_api"*precision*".jl"),
-                  common_file = joinpath(@__DIR__, "questclang_common"*precision*".jl"),
+                  output_file = joinpath(@__DIR__, "questclang_api_"*precision*".jl"),
+                  common_file = joinpath(@__DIR__, "questclang_common_"*precision*".jl"),
                   clang_includes = vcat(questclang_include, CLANG_INCLUDE),
                   clang_args = ["-I", joinpath(questclang_include, ".."), "-DQuEST_PREC=$(makePrecision)"],
                   header_wrapped = (root, current)->root == current,

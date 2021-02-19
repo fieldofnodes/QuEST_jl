@@ -2,7 +2,7 @@
 #
 
 function compactUnitary(qureg       ::QuEST_Types.Qureg,
-                        targetQubit ::T where T<:Integer,
+                        targetQubit ::Integer,
                         α           ::Complex{Qreal},
                         β           ::Complex{Qreal})   ::Nothing
 
@@ -21,8 +21,8 @@ function compactUnitary(qureg       ::QuEST_Types.Qureg,
 end
 
 function controlledCompactUnitary(qureg          ::QuEST_Types.Qureg,
-                                  controlQubit   ::T where T<:Integer,
-                                  targetQubit    ::T where T<:Integer,
+                                  controlQubit   ::Integer,
+                                  targetQubit    ::Integer,
                                   α              ::Complex{Qreal},
                                   β              ::Complex{Qreal} ) ::Nothing
 
@@ -41,7 +41,7 @@ function controlledCompactUnitary(qureg          ::QuEST_Types.Qureg,
 end
 
 function controlledMultiQubitUnitary(qureg   ::QuEST_Types.Qureg,
-                                     ctrl    ::T where T<:Integer,
+                                     ctrl    ::Integer,
                                      targs   ::Vector{Cint},
                                      u       ::QuEST_Types.ComplexMatrixN) ::Nothing
     ccall(:controlledMultiQubitUnitary,
@@ -57,8 +57,8 @@ end
 
 
 function controlledNot(qureg         ::QuEST_Types.Qureg,
-                       controlQubit  ::T where T<:Integer,
-                       targetQubit   ::T where T<:Integer)   ::Nothing
+                       controlQubit  ::Integer,
+                       targetQubit   ::Integer)   ::Nothing
     ccall(:controlledNot,
           Cvoid,
           (QuEST_Types.Qureg, Cint, Cint),
@@ -70,8 +70,8 @@ end
 
 
 function controlledPauliY(qureg         ::QuEST_Types.Qureg,
-                          controlQubit  ::T where T<:Integer,
-                          targetQubit   ::T where T<:Integer)   ::Nothing
+                          controlQubit  ::Integer,
+                          targetQubit   ::Integer)   ::Nothing
 
     ccall(:controlledPauliY,
           Cvoid,
@@ -83,8 +83,8 @@ function controlledPauliY(qureg         ::QuEST_Types.Qureg,
 end
 
 function controlledPhaseFlip(qureg         ::QuEST_Types.Qureg,
-                             controlQubit  ::T where T<:Integer,
-                             targetQubit   ::T where T<:Integer)   ::Nothing
+                             controlQubit  ::Integer,
+                             targetQubit   ::Integer)   ::Nothing
 
     ccall(:controlledPhaseFlip,
           Cvoid,
@@ -97,8 +97,8 @@ end
 
 
 function controlledPhaseShift(qureg    ::QuEST_Types.Qureg,
-    idQubit1 ::T where T<:Integer,
-    idQubit2 ::T where T<:Integer,
+    idQubit1 ::Integer,
+    idQubit2 ::Integer,
     angle    ::Qreal)   ::Nothing
 ccall(:controlledPhaseShift,
 Cvoid,
@@ -112,8 +112,8 @@ end
 
 
 function controlledRotateAroundAxis(qureg        ::QuEST_Types.Qureg,
-    controlQubit ::T where T<:Integer,
-    targetQubit  ::T where T<:Integer,
+    controlQubit ::Integer,
+    targetQubit  ::Integer,
     angle        ::Qreal,
     axis         ::Vector{Qreal})  ::Nothing
 @assert length axis == 3
@@ -130,8 +130,8 @@ return nothing
 end
 
 function controlledRotateX(qureg         ::QuEST_Types.Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer,
+    controlQubit  ::Integer,
+    targetQubit   ::Integer,
     angle         ::Qreal)  ::Nothing
 ccall(:controlledRotateX,
 Cvoid,
@@ -146,8 +146,8 @@ end
 
 
 function controlledRotateY(qureg         ::QuEST_Types.Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer,
+    controlQubit  ::Integer,
+    targetQubit   ::Integer,
     angle         ::Qreal)  ::Nothing
 
 ccall(:controlledRotateY,
@@ -161,8 +161,8 @@ return nothing
 end
 
 function controlledRotateZ(qureg         ::QuEST_Types.Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer,
+    controlQubit  ::Integer,
+    targetQubit   ::Integer,
     angle         ::Qreal)  ::Nothing
 
 ccall(:controlledRotateZ,
@@ -196,9 +196,9 @@ function _quest_mtx_4(U ::Matrix{Complex{Qreal}}) ::QuEST_Types.ComplexMatrix4
 end
 
 function controlledTwoQubitUnitary(qureg         ::QuEST_Types.Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit1  ::T where T<:Integer,
-    targetQubit2  ::T where T<:Integer,
+    controlQubit  ::Integer,
+    targetQubit1  ::Integer,
+    targetQubit2  ::Integer,
     U             ::Matrix{Complex{Qreal}}) ::Nothing
 
 @assert size(U) == (2, 2)
@@ -216,8 +216,8 @@ end
 
 
 function controlledUnitary(qureg        ::QuEST_Types.Qureg,
-    controlQubit ::T where T<:Integer,
-    targetQubit  ::T where T<:Integer,
+    controlQubit ::Integer,
+    targetQubit  ::Integer,
     U            ::Matrix{Complex{Qreal}}) ::Nothing
 u = _quest_mtx_2(U)
 
@@ -231,7 +231,7 @@ u)
 return nothing
 end
 
-function hadamard(qureg ::QuEST_Types.Qureg,  targetQubit ::T where T<:Integer) ::Nothing
+function hadamard(qureg ::QuEST_Types.Qureg,  targetQubit ::Integer) ::Nothing
 
 ccall(:hadamard, Cvoid, (QuEST_Types.Qureg, Cint), qureg, Cint(targetQubit))
 return nothing
@@ -282,8 +282,8 @@ end
 
 function multiControlledTwoQubitUnitary(qureg           ::QuEST_Types.Qureg,
                                         controlQubits   ::Vector{Cint},
-                                        targetQubit1    ::T where T<:Integer,
-                                        targetQubit2    ::T where T<:Integer,
+                                        targetQubit1    ::Integer,
+                                        targetQubit2    ::Integer,
                                         U               ::Matrix{Complex{Qreal}}) ::Nothing
     u = _quest_mtx_4(U)
     ccall(:multiControlledTwoQubitUnitary,
@@ -300,7 +300,7 @@ end
 
 function multiControlledUnitary(qureg         ::QuEST_Types.Qureg,
                                 controlQubits ::Vector{Cint},
-                                targetQubit   ::T where T<:Integer,
+                                targetQubit   ::Integer,
                                 U             ::Matrix{Complex{Qreal}}) ::Nothing
 
     u = _quest_mtx_2(U)
@@ -367,7 +367,7 @@ end
 function multiStateControlledUnitary(qureg           ::QuEST_Types.Qureg,
                                      controlQubits   ::Vector{Cint},
                                      controlState    ::Vector{Cint},
-                                     targetQubit     ::T where T<:Integer,
+                                     targetQubit     ::Integer,
                                      U               ::Matrix{Complex{Qreal}}) ::Nothing
 
     @assert length(controlQubits) == length(controlState)
@@ -385,7 +385,7 @@ function multiStateControlledUnitary(qureg           ::QuEST_Types.Qureg,
     return nothing
 end
 
-function pauliX(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer):: Nothing
+function pauliX(qureg ::QuEST_Types.Qureg, targetQubit ::Integer):: Nothing
 
     ccall(:pauliX,
           Cvoid,
@@ -395,7 +395,7 @@ function pauliX(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer):: N
 
     return nothing
 end
-function pauliY(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer):: Nothing
+function pauliY(qureg ::QuEST_Types.Qureg, targetQubit ::Integer):: Nothing
 
     ccall(:pauliY,
           Cvoid,
@@ -405,7 +405,7 @@ function pauliY(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer):: N
 
     return nothing
 end
-function pauliZ(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer):: Nothing
+function pauliZ(qureg ::QuEST_Types.Qureg, targetQubit ::Integer):: Nothing
 
     ccall(:pauliZ,
           Cvoid,
@@ -417,7 +417,7 @@ function pauliZ(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer):: N
 end
 
 function phaseShift(qureg       ::QuEST_Types.Qureg,
-                    targetQubit ::T where T<:Integer,
+                    targetQubit ::Integer,
                     angle       ::Qreal) ::Nothing
 
     ccall(:phaseShift,
@@ -430,7 +430,7 @@ function phaseShift(qureg       ::QuEST_Types.Qureg,
 end
 
 function rotateAroundAxis(qureg         ::QuEST_Types.Qureg,
-                          rotQubit      ::T where T<:Integer,
+                          rotQubit      ::Integer,
                           angle         ::Qreal,
                           axis          ::Vector{Qreal}) ::Nothing
 
@@ -445,7 +445,7 @@ function rotateAroundAxis(qureg         ::QuEST_Types.Qureg,
     return nothing
 end
 
-function rotateX(qureg  ::QuEST_Types.Qureg, rotQubit ::T where T<:Integer, angle ::Qreal) ::Nothing
+function rotateX(qureg  ::QuEST_Types.Qureg, rotQubit ::Integer, angle ::Qreal) ::Nothing
 
     ccall(:rotateX,
           Cvoid,
@@ -456,7 +456,7 @@ function rotateX(qureg  ::QuEST_Types.Qureg, rotQubit ::T where T<:Integer, angl
     return nothing
 end
 
-function rotateY(qureg ::QuEST_Types.Qureg, rotQubit ::T where T<:Integer, angle ::Qreal) ::Nothing
+function rotateY(qureg ::QuEST_Types.Qureg, rotQubit ::Integer, angle ::Qreal) ::Nothing
 
     ccall(:rotateY,
           Cvoid,
@@ -466,7 +466,7 @@ function rotateY(qureg ::QuEST_Types.Qureg, rotQubit ::T where T<:Integer, angle
           angle)
     return nothing
 end
-function rotateZ(qureg ::QuEST_Types.Qureg, rotQubit ::T where T<:Integer, angle ::Qreal) ::Nothing
+function rotateZ(qureg ::QuEST_Types.Qureg, rotQubit ::Integer, angle ::Qreal) ::Nothing
 
     ccall(:rotateZ,
           Cvoid,
@@ -477,7 +477,7 @@ function rotateZ(qureg ::QuEST_Types.Qureg, rotQubit ::T where T<:Integer, angle
     return nothing
 end
 
-function sGate(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer) ::Nothing
+function sGate(qureg ::QuEST_Types.Qureg, targetQubit ::Integer) ::Nothing
 
     ccall(:sGate,
           Cvoid,
@@ -487,7 +487,7 @@ function sGate(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer) ::No
     return nothing
 end
 
-function sqrtSwapGate(qureg ::QuEST_Types.Qureg, qubit1 ::T where T<:Integer, qubit2 ::T where T<:Integer) ::Nothing
+function sqrtSwapGate(qureg ::QuEST_Types.Qureg, qubit1 ::Integer, qubit2 ::Integer) ::Nothing
 
     ccall(:sqrtSwapGate,
           Cvoid,
@@ -498,7 +498,7 @@ function sqrtSwapGate(qureg ::QuEST_Types.Qureg, qubit1 ::T where T<:Integer, qu
     return nothing
 end
 
-function swapGate(qureg ::QuEST_Types.Qureg, qubit1 ::T where T<:Integer, qubit2 ::T where T<:Integer) ::Nothing
+function swapGate(qureg ::QuEST_Types.Qureg, qubit1 ::Integer, qubit2 ::Integer) ::Nothing
 
     ccall(:swapGate,
           Cvoid,
@@ -510,7 +510,7 @@ function swapGate(qureg ::QuEST_Types.Qureg, qubit1 ::T where T<:Integer, qubit2
     return nothing
 end
 
-function tGate(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer) ::Nothing
+function tGate(qureg ::QuEST_Types.Qureg, targetQubit ::Integer) ::Nothing
 
     ccall(:tGate,
           Cvoid,
@@ -521,8 +521,8 @@ function tGate(qureg ::QuEST_Types.Qureg, targetQubit ::T where T<:Integer) ::No
 end
 
 function twoQubitUnitary(qureg           ::QuEST_Types.Qureg,
-                         targetQubit1    ::T where T<:Integer,
-                         targetQubit2    ::T where T<:Integer,
+                         targetQubit1    ::Integer,
+                         targetQubit2    ::Integer,
                          U               ::Matrix{Complex{Qreal}}) ::Nothing
 
     u = _quest_mtx_4(U)
@@ -539,7 +539,7 @@ function twoQubitUnitary(qureg           ::QuEST_Types.Qureg,
 end
 
 function unitary(qureg           ::QuEST_Types.Qureg,
-                 targetQubit     ::T where T<:Integer,
+                 targetQubit     ::Integer,
                  U               ::Matrix{Complex{Qreal}}) ::Nothing
 
     u = _quest_mtx_2(U)

@@ -5,24 +5,24 @@ function createCloneQureg(qureg ::QuEST_Types.Qureg, env ::QuEST_Types.QuESTEnv)
     return ccall(:createCloneQureg, QuEST_Types.Qureg, (QuEST_Types.Qureg,QuEST_Types.QuESTEnv), qureg, env)
 end
 
-function createComplexMatrixN(numQubits ::T where T<:Integer) ::QuEST_Types.ComplexMatrixN
+function createComplexMatrixN(numQubits ::Integer) ::QuEST_Types.ComplexMatrixN
     @assert 1 ≤ numQubits ≤ 50
 
     return ccall(:createComplexMatrixN, QuEST_Types.ComplexMatrixN, (Cint,), Cint(numQubits))
 end
 
-function createDensityQureg(numQubits ::T where T<:Integer, env ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
+function createDensityQureg(numQubits ::Integer, env ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
     @assert 1 ≤ numQubits ≤ 50
     return ccall(:createDensityQureg, QuEST_Types.Qureg, (Cint,QuEST_Types.QuESTEnv), Cint(numQubits), env)
 end
 
-function createDiagonalOp(numQubits     :: T where T<:Integer,
+function createDiagonalOp(numQubits     :: Integer,
     env           :: QuEST_Types.QuESTEnv)    :: QuEST_Types.DiagonalOp
 return ccall(:createDiagonalOp, QuEST_Types.DiagonalOp, (Cint, QuEST_Types.QuESTEnv), Cint(numQubits), env)
 end
 
-function createPauliHamil(numQubits     :: T where T<:Integer,
-    numSumTerms   :: T where T<:Integer)     :: QuEST_Types.PauliHamil
+function createPauliHamil(numQubits     :: Integer,
+    numSumTerms   :: Integer)     :: QuEST_Types.PauliHamil
 return ccall(:createPauliHamil, QuEST_Types.PauliHamil, (Cint, Cint), Cint(numQubits), Cint(numSumTerms))
 end
 
@@ -35,7 +35,7 @@ function createQuESTEnv() :: QuEST_Types.QuESTEnv
     return ccall(:createQuESTEnv, QuEST_Types.QuESTEnv, () )
 end
 
-function createQureg(numQubits ::T where T<:Integer, env ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
+function createQureg(numQubits ::Integer, env ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
     @assert 1 ≤ numQubits ≤ 50
 
     return ccall(:createQureg, QuEST_Types.Qureg, (Cint,QuEST_Types.QuESTEnv), Cint(numQubits), env)
@@ -96,10 +96,10 @@ function initPauliHamil(hamil       :: QuEST_Types.PauliHamil,
 end
 
 function setDiagonalOpElems(op          ::QuEST_Types.DiagonalOp,
-    startInd    ::T where T<:Integer,
+    startInd    ::Integer,
     real_       ::Vector{Qreal},
     imag_       ::Vector{Qreal},
-    numElems    ::T where T<:Integer)  ::Nothing
+    numElems    ::Integer)  ::Nothing
 ccall(:setDiagonalOpElems,
 Cvoid,
 (QuEST_Types.DiagonalOp, Clonglong, Ptr{Qreal}, Ptr{Qreal}, Clonglong),

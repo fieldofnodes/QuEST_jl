@@ -96,8 +96,8 @@ function calcInnerProduct(bra ::QuEST_Types.Qureg, ket ::QuEST_Types.Qureg) ::Co
 end
 
 function calcProbOfOutcome(qureg        ::QuEST_Types.Qureg,
-    measureQubit ::T where T<:Integer,
-    outcome      ::T where T<:Integer)   ::Qreal
+    measureQubit ::Integer,
+    outcome      ::Integer)   ::Qreal
 
 p = ccall(:calcProbOfOutcome,
 Qreal,
@@ -124,14 +124,14 @@ function calcTotalProb(qureg ::QuEST_Types.Qureg) ::Qreal
 
 end
 
-function getAmp(qureg ::QuEST_Types.Qureg,  idx ::T where T<:Integer) ::Complex{Qreal}
+function getAmp(qureg ::QuEST_Types.Qureg,  idx ::Integer) ::Complex{Qreal}
 
     α = ccall(:getAmp, QuEST_Types.Complex, (QuEST_Types.Qureg, Clonglong), qureg, Clonglong(idx))
     return Complex{Qreal}(α.real,α.imag)
 
 end
 
-function getDensityAmp(qureg ::QuEST_Types.Qureg, row ::T where T<:Integer, col ::T where T<:Integer) ::Complex{Qreal}
+function getDensityAmp(qureg ::QuEST_Types.Qureg, row ::Integer, col ::Integer) ::Complex{Qreal}
 
     α = ccall(:getDensityAmp,
               QuEST_Types.Complex,
@@ -144,7 +144,7 @@ function getDensityAmp(qureg ::QuEST_Types.Qureg, row ::T where T<:Integer, col 
 
 end
 
-function getImagAmp(qureg       ::QuEST_Types.Qureg, index      ::T where T<:Integer)      ::Qreal
+function getImagAmp(qureg       ::QuEST_Types.Qureg, index      ::Integer)      ::Qreal
 
     ret = ccall(:getImagAmp, Qreal, (QuEST_Types.Qureg, Clonglong), qureg, Clonglong(index))
     return ret
@@ -163,14 +163,14 @@ function getNumQubits(qureg ::QuEST_Types.Qureg) ::Cint
 
 end
 
-function getProbAmp(qureg ::QuEST_Types.Qureg, idx ::T where T<:Integer) :: Qreal
+function getProbAmp(qureg ::QuEST_Types.Qureg, idx ::Integer) :: Qreal
 
     p = ccall(:getProbAmp, Qreal, (QuEST_Types.Qureg, Clonglong), qureg, Clonglong(idx))
     return p
 
 end
 
-function getRealAmp(qureg ::QuEST_Types.Qureg, idx ::T where T<:Integer) :: Qreal
+function getRealAmp(qureg ::QuEST_Types.Qureg, idx ::Integer) :: Qreal
 
     p = ccall(:getRealAmp, Qreal, (QuEST_Types.Qureg, Clonglong), qureg, Clonglong(idx))
     return p

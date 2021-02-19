@@ -48,7 +48,7 @@ function reportState(qureg ::QuEST_Types.Qureg) ::Nothing
     return nothing
 end
 
-function reportStateToScreen(qureg ::QuEST_Types.Qureg, env ::QuEST_Types.QuESTEnv, reportRank ::T where T<:Integer) ::Nothing
+function reportStateToScreen(qureg ::QuEST_Types.Qureg, env ::QuEST_Types.QuESTEnv, reportRank ::Integer) ::Nothing
     ccall(:reportStateToScreen,
           Cvoid,
           (QuEST_Types.Qureg, QuEST_Types.QuESTEnv, Cint),
@@ -80,7 +80,7 @@ function syncQuESTEnv(env ::QuEST_Types.QuESTEnv) ::Nothing
     return nothing
 end
 
-function syncQuESTSuccess(successCode       ::T where T<:Integer)       ::Cint
+function syncQuESTSuccess(successCode       ::Integer)       ::Cint
     return ccall(:syncQuESTSuccess, Cint, (Cint,), Cint(successCode))
 end
 

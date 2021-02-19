@@ -9,7 +9,7 @@ function applyDiagonalOp(qureg          :: QuEST_Types.Qureg,
 end
 
 function applyMatrix2(qureg             :: QuEST_Types.Qureg,
-    targetQubit       :: T where T<:Integer,
+    targetQubit       :: Integer,
     u                 :: QuEST_Types.ComplexMatrix2)  ::Nothing
 
     ccall(:applyMatrix2, Cvoid, (QuEST_Types.Qureg, Cint, QuEST_Types.ComplexMatrix2), qureg, Cint(targetQubit), u)
@@ -17,8 +17,8 @@ function applyMatrix2(qureg             :: QuEST_Types.Qureg,
 end
 
 function applyMatrix4(qureg             :: QuEST_Types.Qureg,
-    targetQubit1      :: T where T<:Integer,
-    targetQubit2      :: T where T<:Integer,
+    targetQubit1      :: Integer,
+    targetQubit2      :: Integer,
     u                 :: QuEST_Types.ComplexMatrix4)   ::Nothing
 
     ccall(:applyMatrix4,
@@ -33,7 +33,7 @@ end
 
 function applyMatrixN(qureg             :: QuEST_Types.Qureg,
                      targs             :: Vector{Cint},
-                     numTargs          ::  T where T<:Integer,
+                     numTargs          ::  Integer,
                      u                 :: QuEST_Types.ComplexMatrixN)   ::Nothing
 
     ccall(:applyMatrixN,
@@ -49,9 +49,9 @@ end
 
 function applyMultiControlledMatrixN(qureg          :: QuEST_Types.Qureg,
     ctrls          :: Vector{T} where T<:Integer,
-    numCtrls       :: T where T<:Integer,
+    numCtrls       :: Integer,
     targs          :: Vector{T} where T<:Integer,
-    numTargs       :: T where T<:Integer,
+    numTargs       :: Integer,
     u              :: QuEST_Types.ComplexMatrixN)  ::Nothing
 
     ccall(:applyMultiControlledMatrixN,
@@ -77,7 +77,7 @@ end
 function applyPauliSum(inQureg        ::QuEST_Types.Qureg,
                        allPauliCodes  ::Vector{QuEST_Types.pauliOpType},
                        termCoeffs     ::Vector{Qreal},
-                       numSumTerms    ::T where T<:Integer,
+                       numSumTerms    ::Integer,
                        outQureg       ::QuEST_Types.Qureg)          ::Nothing
 
     @assert length(termCoeffs) == numSumTerms * getNumQubits(inQureg)
@@ -97,8 +97,8 @@ end
 function applyTrotterCircuit(qureg          :: QuEST_Types.Qureg,
     hamil          :: QuEST_Types.PauliHamil,
     time           :: Qreal,
-    order          :: T where T<:Integer,
-    reps           :: T where T<:Integer)  ::Nothing
+    order          :: Integer,
+    reps           :: Integer)  ::Nothing
 
     ccall(:applyTrotterCircuit,
           Cvoid,

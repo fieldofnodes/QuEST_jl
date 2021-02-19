@@ -14,7 +14,7 @@ function initBlankState(qureg ::QuEST_Types.Qureg) ::Nothing
 
 end
 
-function initClassicalState(qureg ::QuEST_Types.Qureg, stateInd ::T where T<:Integer) ::Nothing
+function initClassicalState(qureg ::QuEST_Types.Qureg, stateInd ::Integer) ::Nothing
 
     ccall(:initClassicalState, Cvoid, (QuEST_Types.Qureg,Clonglong), qureg, Clonglong(stateInd))
     return nothing
@@ -60,9 +60,9 @@ function initZeroState(qureg ::QuEST_Types.Qureg) ::Nothing
 end
 
 function setAmps(qureg                  ::QuEST_Types.Qureg,
-                 startIdx               ::T where T<:Integer,
+                 startIdx               ::Integer,
                  amps                   ::Vector{Complex{Qreal}},
-                 numAmps                ::T where T<:Integer)          :: Nothing
+                 numAmps                ::Integer)          :: Nothing
 
     @assert length(amps) == numAmps
     @assert numAmps + startIdx <= qureg.numQubitsInStateVec
