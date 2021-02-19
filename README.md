@@ -64,8 +64,8 @@ precision, until you stop Julia.
 We refer to QuEST for the documentation of all functions and types.
 
 In Julia:
-* The module QuEST_jl.QuESTxx contains all functions (`createQureg()` and whatnot)
-* The module QuEST_jl.QuESTxx.QuEST_Types contains all types (`Qureg` and whatnot)
+* The module `QuEST_jl.QuEST`*xx* contains all functions (`createQureg()` and whatnot)
+* The module `QuEST_jl.QuEST`*xx*`.QuEST_Types` contains all types (`Qureg` and whatnot)
 
 ## Version History
 
