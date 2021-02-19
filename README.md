@@ -7,11 +7,6 @@ scientific computing language [Julia](https://julialang.org/).
 
 ## Installation
 
-
-## Documentation
-
-We refer to QuEST for the documentation of all functions and types.
-
 #### Non-expert QuEST users
 
 Download and build the Julia package like this:
@@ -63,6 +58,14 @@ You need to make available for automatic loading two dynamically loaded librarie
 As in the non-expert version, once you create a QuEST environment with
 a precision, the library is loaded, and Julia is bound to that
 precision, until you stop Julia.
+
+## Documentation
+
+We refer to QuEST for the documentation of all functions and types.
+
+In Julia:
+* The module QuEST_jl.QuESTxx contains all functions (`createQureg()` and whatnot)
+* The module QuEST_jl.QuESTxx.QuEST_Types contains all types (`qureg` and whatnot)
 
 ## Version History
 
