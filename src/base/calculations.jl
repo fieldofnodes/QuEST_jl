@@ -93,17 +93,17 @@ function calcInnerProduct(bra ::Qureg, ket ::Qureg) ::Base.Complex{Qreal}
 end
 
 function calcProbOfOutcome(qureg        ::Qureg,
-    measureQubit ::T where T<:Integer,
-    outcome      ::T where T<:Integer)   ::Qreal
+                           measureQubit ::T where T<:Integer,
+                           outcome      ::T where T<:Integer)   ::Qreal
 
-p = ccall(:calcProbOfOutcome, 
-Qreal, 
-(Qureg, Cint, Cint), 
-qureg, 
-Cint(measureQubit), 
-Cint(outcome))
+    p = ccall(:calcProbOfOutcome, 
+              Qreal, 
+              (Qureg, Cint, Cint), 
+              qureg, 
+              Cint(measureQubit), 
+              Cint(outcome))
 
-return p
+    return p
 
 end
 

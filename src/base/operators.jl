@@ -14,18 +14,18 @@ nothing;
 end
 
 function applyMatrix4(qureg             :: Qureg,
-    targetQubit1      :: T where T<:Integer,
-    targetQubit2      :: T where T<:Integer,
-    u                 :: ComplexMatrix4)   ::Nothing
+                      targetQubit1      :: T where T<:Integer,
+                      targetQubit2      :: T where T<:Integer,
+                      u                 :: ComplexMatrix4)   ::Nothing
 
-ccall(:applyMatrix4, 
-Cvoid, 
-(Qureg, Cint, Cint, ComplexMatrix4), 
-qureg, 
-Cint(targetQubit1), 
-Cint(targetQubit2), 
-u)
-return nothing
+    ccall(:applyMatrix4, 
+          Cvoid, 
+          (Qureg, Cint, Cint, ComplexMatrix4), 
+          qureg, 
+          Cint(targetQubit1), 
+          Cint(targetQubit2), 
+          u)
+    return nothing
 end
 
 function applyMatrixN(qureg             :: Qureg,
@@ -45,22 +45,22 @@ function applyMatrixN(qureg             :: Qureg,
 end
 
 function applyMultiControlledMatrixN(qureg          :: Qureg,
-    ctrls          :: Base.Vector{T} where T<:Integer,
-    numCtrls       :: T where T<:Integer,
-    targs          :: Base.Vector{T} where T<:Integer,
-    numTargs       :: T where T<:Integer,
-    u              :: ComplexMatrixN)  ::Nothing
+                                     ctrls          :: Base.Vector{Cint},
+                                     numCtrls       :: T where T<:Integer,
+                                     targs          :: Base.Vector{Cint},
+                                     numTargs       :: T where T<:Integer,
+                                     u              :: ComplexMatrixN)  ::Nothing
 
-ccall(:applyMultiControlledMatrixN, 
-Cvoid, 
-(Qureg, Ptr{Cint}, Cint, Ptr{Cint}, Cint, ComplexMatrixN),
-qureg,
-Cint.(ctrls),
-Cint(numCtrls),
-Cint(targs),
-Cint(numTargs),
-u)
-nothing;
+    ccall(:applyMultiControlledMatrixN, 
+          Cvoid, 
+          (Qureg, Ptr{Cint}, Cint, Ptr{Cint}, Cint, ComplexMatrixN),
+          qureg,
+          ctrls,
+          Cint(numCtrls),
+          targs,
+          Cint(numTargs),
+          u)
+    return nothing
 end
 
 function applyPauliHamil(inQureg        :: Qureg,
@@ -68,7 +68,7 @@ function applyPauliHamil(inQureg        :: Qureg,
                          outQureg       :: Qureg)  ::Nothing
 
     ccall(:applyPauliHamil, Cvoid, (Qureg, PauliHamil, Qureg), inQureg, hamil, outQureg)
-nothing;
+    return nothing
 end
 
 function applyPauliSum(inQureg        ::Qureg,
@@ -92,19 +92,19 @@ function applyPauliSum(inQureg        ::Qureg,
 end
 
 function applyTrotterCircuit(qureg          :: Qureg,
-    hamil          :: PauliHamil,
-    time           :: Qreal,
-    order          :: T where T<:Integer,
-    reps           :: T where T<:Integer)  ::Nothing
+                             hamil          :: PauliHamil,
+                             time           :: Qreal,
+                             order          :: T where T<:Integer,
+                             reps           :: T where T<:Integer)  ::Nothing
 
-ccall(:applyTrotterCircuit, 
-Cvoid, 
-(Qureg, PauliHamil, Qreal, Cint, Cint),
-qureg,
-hamil,
-time,
-Cint(order),
-Cint(reps))
+    ccall(:applyTrotterCircuit, 
+          Cvoid, 
+          (Qureg, PauliHamil, Qreal, Cint, Cint),
+          qureg,
+          hamil,
+          time,
+          Cint(order),
+          Cint(reps))
 
 return nothing
 end

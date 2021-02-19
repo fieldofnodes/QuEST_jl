@@ -93,19 +93,20 @@ function initPauliHamil(hamil       :: PauliHamil,
 end
 
 function setDiagonalOpElems(op          ::DiagonalOp,
-    startInd    ::T where T<:Integer,
-    real_       ::Base.Vector{Qreal},
-    imag_       ::Base.Vector{Qreal},
-    numElems    ::T where T<:Integer)  ::Nothing
-ccall(:setDiagonalOpElems, 
-Cvoid, 
-(DiagonalOp, Clonglong, Ptr{Qreal}, Ptr{Qreal}, Clonglong), 
-op, 
-Clonglong(startInd), 
-real_, 
-imag_, 
-Clonglong(numElems))
-return nothing
+                            startInd    ::T where T<:Integer,
+                            real_       ::Base.Vector{Qreal},
+                            imag_       ::Base.Vector{Qreal},
+                            numElems    ::T where T<:Integer)  ::Nothing
+
+    ccall(:setDiagonalOpElems, 
+          Cvoid, 
+          (DiagonalOp, Clonglong, Ptr{Qreal}, Ptr{Qreal}, Clonglong), 
+          op, 
+          Clonglong(startInd), 
+          real_, 
+          imag_, 
+          Clonglong(numElems))
+    return nothing
 end
 
 function syncDiagonalOp(op        ::DiagonalOp)     ::Nothing

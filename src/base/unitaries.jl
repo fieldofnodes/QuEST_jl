@@ -18,22 +18,23 @@ function compactUnitary(qureg       ::Qureg,
 end
 
 function controlledCompactUnitary(qureg          ::Qureg,
-    controlQubit   ::T where T<:Integer,
-    targetQubit    ::T where T<:Integer,
-    α              ::Base.Complex{Qreal},
-    β              ::Base.Complex{Qreal} ) ::Nothing
-alpha = QuEST_types.Complex(real(α),imag(α))
-beta  = QuEST_types.Complex(real(β),imag(β))
+                                  controlQubit   ::T where T<:Integer,
+                                  targetQubit    ::T where T<:Integer,
+                                  α              ::Base.Complex{Qreal},
+                                  β              ::Base.Complex{Qreal} ) ::Nothing
+    
+    alpha = QuEST_types.Complex(real(α),imag(α))
+    beta  = QuEST_types.Complex(real(β),imag(β))
 
-ccall(:controlledCompactUnitary, 
-Cvoid, 
-(Qureg, Cint, Cint, Complex, Complex), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit), 
-alpha, 
-beta)
-return nothing
+    ccall(:controlledCompactUnitary, 
+          Cvoid, 
+          (Qureg, Cint, Cint, Complex, Complex), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit), 
+          alpha, 
+          beta)
+    return nothing
 end
 
 function controlledMultiQubitUnitary(qureg   ::Qureg,
@@ -54,121 +55,122 @@ end
 
 
 function controlledNot(qureg         ::Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer)   ::Nothing
+                       controlQubit  ::T where T<:Integer,
+                       targetQubit   ::T where T<:Integer)   ::Nothing
 
-ccall(:controlledNot, 
-Cvoid, 
-(Qureg, Cint, Cint), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit))
-return nothing
+    ccall(:controlledNot, 
+          Cvoid, 
+          (Qureg, Cint, Cint), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit))
+    return nothing
 end
 
 
 function controlledPauliY(qureg         ::Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer)   ::Nothing
-ccall(:controlledPauliY, 
-Cvoid, 
-(Qureg, Cint, Cint), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit))
-return nothing
+                          controlQubit  ::T where T<:Integer,
+                          targetQubit   ::T where T<:Integer)   ::Nothing
+    ccall(:controlledPauliY, 
+          Cvoid, 
+          (Qureg, Cint, Cint), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit))
+    return nothing
 end
 
 function controlledPhaseFlip(qureg         ::Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer)   ::Nothing
-ccall(:controlledPhaseFlip, 
-Cvoid, 
-(Qureg, Cint, Cint), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit))
-return nothing
+                             controlQubit  ::T where T<:Integer,
+                             targetQubit   ::T where T<:Integer)   ::Nothing
+    ccall(:controlledPhaseFlip, 
+          Cvoid, 
+          (Qureg, Cint, Cint), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit))
+    return nothing
 end
 
 
 function controlledPhaseShift(qureg    ::Qureg,
-    idQubit1 ::T where T<:Integer,
-    idQubit2 ::T where T<:Integer,
-    angle    ::Qreal)   ::Nothing
-ccall(:controlledPhaseShift, 
-Cvoid, 
-(Qureg, Cint, Cint, Qreal), 
-qureg, 
-Cint(idQubit1), 
-Cint(idQubit2), 
-angle)
-return nothing
+                              idQubit1 ::T where T<:Integer,
+                              idQubit2 ::T where T<:Integer,
+                              angle    ::Qreal)   ::Nothing
+    ccall(:controlledPhaseShift, 
+          Cvoid, 
+          (Qureg, Cint, Cint, Qreal), 
+          qureg, 
+          Cint(idQubit1), 
+          Cint(idQubit2), 
+          angle)
+    return nothing
 end
 
 
 function controlledRotateAroundAxis(qureg        ::Qureg,
-    controlQubit ::T where T<:Integer,
-    targetQubit  ::T where T<:Integer,
-    angle        ::Qreal,
-    axis         ::Base.Vector{Qreal})  ::Nothing
-@assert length axis == 3
-q_axis = QuEST_types.Vector(axis[1], axis[2], axis[3])
-ccall(:controlledRotateAroundAxis, 
-Cvoid, 
-(Qureg, Cint, Cint, Qreal, QuEST_types.Vector), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit), 
-angle, 
-q_axis)
-return nothing
+                                    controlQubit ::T where T<:Integer,
+                                    targetQubit  ::T where T<:Integer,
+                                    angle        ::Qreal,
+                                    axis         ::Base.Vector{Qreal})  ::Nothing
+
+    @assert length axis == 3
+    q_axis = QuEST_types.Vector(axis[1], axis[2], axis[3])
+    ccall(:controlledRotateAroundAxis, 
+          Cvoid, 
+          (Qureg, Cint, Cint, Qreal, QuEST_types.Vector), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit), 
+          angle, 
+          q_axis)
+    return nothing
 end
 
 function controlledRotateX(qureg         ::Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer,
-    angle         ::Qreal)  ::Nothing
-ccall(:controlledRotateX, 
-Cvoid, 
-(Qureg, Cint, Cint, Qreal), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit), 
-angle)
+                           controlQubit  ::T where T<:Integer,
+                           targetQubit   ::T where T<:Integer,
+                           angle         ::Qreal)  ::Nothing
+    ccall(:controlledRotateX, 
+          Cvoid, 
+          (Qureg, Cint, Cint, Qreal), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit), 
+          angle)
 
-return nothing
+    return nothing
 end
 
 
 function controlledRotateY(qureg         ::Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer,
-    angle         ::Qreal)  ::Nothing
+                           controlQubit  ::T where T<:Integer,
+                           targetQubit   ::T where T<:Integer,
+                           angle         ::Qreal)  ::Nothing
 
-ccall(:controlledRotateY, 
-Cvoid, 
-(Qureg, Cint, Cint, Qreal), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit), 
-angle)
-return nothing
+    ccall(:controlledRotateY, 
+          Cvoid, 
+          (Qureg, Cint, Cint, Qreal), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit), 
+          angle)
+    return nothing
 end
 
 function controlledRotateZ(qureg         ::Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit   ::T where T<:Integer,
-    angle         ::Qreal)  ::Nothing
+                           controlQubit  ::T where T<:Integer,
+                           targetQubit   ::T where T<:Integer,
+                           angle         ::Qreal)  ::Nothing
 
-ccall(:controlledRotateZ, 
-Cvoid, 
-(Qureg, Cint, Cint, Qreal), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit), 
-angle)
-return nothing
+    ccall(:controlledRotateZ, 
+          Cvoid, 
+          (Qureg, Cint, Cint, Qreal), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit), 
+          angle)
+    return nothing
 end
 
 function _quest_mtx_2(U ::Matrix{Base.Complex{Qreal}}) ::ComplexMatrix2
@@ -192,39 +194,39 @@ function _quest_mtx_4(U ::Matrix{Base.Complex{Qreal}}) ::ComplexMatrix4
 end
 
 function controlledTwoQubitUnitary(qureg         ::Qureg,
-    controlQubit  ::T where T<:Integer,
-    targetQubit1  ::T where T<:Integer,
-    targetQubit2  ::T where T<:Integer,
-    U             ::Matrix{Base.Complex{Qreal}}) ::Nothing
+                                   controlQubit  ::T where T<:Integer,
+                                   targetQubit1  ::T where T<:Integer,
+                                   targetQubit2  ::T where T<:Integer,
+                                   U             ::Matrix{Base.Complex{Qreal}}) ::Nothing
 
-@assert size(U) == (2, 2)
-u = _quest_mtx_4(U)
-ccall(:controlledTwoQubitUnitary, 
-Cvoid, 
-(Qureg, Cint, Cint, Cint, ComplexMatrix4), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit1), 
-Cint(targetQubit2), 
-u)
-return nothing
+    @assert size(U) == (2, 2)
+    u = _quest_mtx_4(U)
+    ccall(:controlledTwoQubitUnitary, 
+          Cvoid, 
+          (Qureg, Cint, Cint, Cint, ComplexMatrix4), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit1), 
+          Cint(targetQubit2), 
+          u)
+    return nothing
 end
 
 
 function controlledUnitary(qureg        ::Qureg,
-    controlQubit ::T where T<:Integer,
-    targetQubit  ::T where T<:Integer,
-    U            ::Matrix{Base.Complex{Qreal}}) ::Nothing
-u = _quest_mtx_2(U)
+                           controlQubit ::T where T<:Integer,
+                           targetQubit  ::T where T<:Integer,
+                           U            ::Matrix{Base.Complex{Qreal}}) ::Nothing
 
-ccall(:controlledUnitary, 
-Cvoid, 
-(Qureg, Cint, Cint, ComplexMatrix2), 
-qureg, 
-Cint(controlQubit), 
-Cint(targetQubit), 
-u)
-return nothing
+    u = _quest_mtx_2(U)
+    ccall(:controlledUnitary, 
+          Cvoid, 
+          (Qureg, Cint, Cint, ComplexMatrix2), 
+          qureg, 
+          Cint(controlQubit), 
+          Cint(targetQubit), 
+          u)
+    return nothing
 end
 
 function hadamard(qureg ::Qureg,  targetQubit ::T where T<:Integer) ::Nothing
@@ -413,16 +415,16 @@ function pauliZ(qureg ::Qureg, targetQubit ::T where T<:Integer):: Nothing
 end
 
 function phaseShift(qureg       ::Qureg,
-    targetQubit ::T where T<:Integer,
-    angle       ::Qreal) ::Nothing
+                    targetQubit ::T where T<:Integer,
+                    angle       ::Qreal) ::Nothing
 
-ccall(:phaseShift, 
-Cvoid, 
-(Qureg, Cint, Qreal),
-qureg, 
-Cint(targetQubit), 
-angle)
-return nothing
+    ccall(:phaseShift, 
+          Cvoid, 
+          (Qureg, Cint, Qreal),
+          qureg, 
+          Cint(targetQubit), 
+          angle)
+    return nothing
 end
 
 function rotateAroundAxis(qureg         ::Qureg, 
@@ -535,17 +537,17 @@ function twoQubitUnitary(qureg           ::Qureg,
 end
 
 function unitary(qureg           ::Qureg,
-    targetQubit     ::T where T<:Integer,
-    U               ::Matrix{Base.Complex{Qreal}}) ::Nothing
+                 targetQubit     ::T where T<:Integer,
+                 U               ::Matrix{Base.Complex{Qreal}}) ::Nothing
 
-u = _quest_mtx_2(U)
+    u = _quest_mtx_2(U)
 
-ccall(:unitary, 
-Cvoid, 
-(Qureg, Cint, ComplexMatrix2),
-qureg, 
-Cint(targetQubit),  
-u)
+    ccall(:unitary, 
+          Cvoid, 
+          (Qureg, Cint, ComplexMatrix2),
+          qureg, 
+          Cint(targetQubit),  
+          u)
 
-return nothing
+    return nothing
 end

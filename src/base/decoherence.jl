@@ -1,5 +1,5 @@
 function mixDamping(qureg       :: Qureg,
-                    targetQubit :: Cint,
+                    targetQubit :: T where T<:Integer,
                     prob        :: Qreal)   ::Nothing
 
     ccall(:mixDamping, Cvoid, (Qureg, Cint, Qreal), qureg, targetQubit, prob)
@@ -17,16 +17,16 @@ function mixDensityMatrix(combineQureg      :: Qureg,
 end
 
 function mixDephasing(qureg         :: Qureg,
-                      targetQubit   :: Cint,
+                      targetQubit   :: T where T<:Integer,
                       prob          :: Qreal)   ::Nothing
 
-    ccall(:mixDephasing, Cvoid, (Qureg, Cint, Qreal), Qureg, targetQubit, prob)
+    ccall(:mixDephasing, Cvoid, (Qureg, Cint, Qreal), qureg, targetQubit, prob)
 
     return nothing
 end
      
 function mixDepolarising(qureg          :: Qureg,
-                         targetQubit    :: Cint,
+                         targetQubit    :: T where T<:Integer,
                          prob           :: Qreal)   ::Nothing
 
     ccall(:mixDepolarising, Cvoid, (Qureg, Cint, Qreal), qureg, targetQubit, prob)
@@ -35,9 +35,9 @@ function mixDepolarising(qureg          :: Qureg,
 end
 
 function mixKrausMap(qureg          :: Qureg,
-                     target         :: Cint,
+                     target         :: T where T<:Integer,
                      ops            :: Base.Vector{ComplexMatrix2},
-                     numOps         :: Cint)   ::Nothing
+                     numOps         :: T where T<:Integer)   ::Nothing
 
     ccall(:mixKrausMap, 
           Cvoid, 
@@ -52,9 +52,9 @@ end
      
 function mixMultiQubitKrausMap(qureg        :: Qureg,
                                targets      :: Base.Vector{Cint},
-                               numTargets   :: Cint,
+                               numTargets   :: T where T<:Integer,
                                ops          :: Base.Vector{ComplexMatrixN},
-                               numOps       :: Cint)   ::Nothing
+                               numOps       :: T where T<:Integer)   ::Nothing
 
     ccall(:mixMultiQubitKrausMap, 
           Cvoid, 
@@ -69,7 +69,7 @@ function mixMultiQubitKrausMap(qureg        :: Qureg,
 end
      
 function mixPauli(qureg         :: Qureg,
-                  targetQubit   :: Cint,
+                  targetQubit   :: T where T<:Integer,
                   probX         :: Qreal,
                   probY         :: Qreal,
                   probZ         :: Qreal)   ::Nothing
@@ -87,8 +87,8 @@ function mixPauli(qureg         :: Qureg,
 end
      
 function mixTwoQubitDephasing(qureg         :: Qureg,
-                              qubit1        :: Cint,
-                              qubit2        :: Cint,
+                              qubit1        :: T where T<:Integer,
+                              qubit2        :: T where T<:Integer,
                               prob          :: Qreal)     ::Nothing
 
     ccall(:mixTwoQubitDephasing, 
@@ -103,8 +103,8 @@ function mixTwoQubitDephasing(qureg         :: Qureg,
 end
      
 function mixTwoQubitDepolarising(qureg         :: Qureg,
-                                 qubit1        :: Cint,
-                                 qubit2        :: Cint,
+                                 qubit1        :: T where T<:Integer,
+                                 qubit2        :: T where T<:Integer,
                                  prob          :: Qreal)     ::Nothing
 
     ccall(:mixTwoQubitDepolarising, 
@@ -119,10 +119,10 @@ function mixTwoQubitDepolarising(qureg         :: Qureg,
 end
 
 function mixTwoQubitKrausMap(qureg         :: Qureg,
-                             qubit1        :: Cint,
-                             qubit2        :: Cint,
+                             qubit1        :: T where T<:Integer,
+                             qubit2        :: T where T<:Integer,
                              ops           :: Base.Vector{ComplexMatrix4},
-                             numOps        :: Cint)     ::Nothing
+                             numOps        :: T where T<:Integer)     ::Nothing
 
     ccall(:mixTwoQubitKrausMap, 
           Cvoid, 
