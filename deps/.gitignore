@@ -1,8 +1,17 @@
+# This is for ignoring files that are generated if you use `build` in
+# your working directory.
+
+# Clang.jl writes these files
+
 LibTemplate.jl
-QuEST/
 build_setup.jl
 ctypes.jl
 questclang_api_32.jl
 questclang_api_64.jl
 questclang_common_32.jl
 questclang_common_64.jl
+
+
+# Build process creates this folder:
+
+QuEST
