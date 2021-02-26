@@ -68,15 +68,29 @@ In Julia:
 We refer to QuEST for the documentation of all functions and types.
 
 
-### Difference from documented QuEST behavior
+#### Difference from documented QuEST behavior
 
 * `measureWithStats()`: instead of taking a reference to the probability, the Julia function
   returns a tuple (outcome,probability)
 
-### Julia-extensions to the QuEST interface
+#### Julia-extensions to the QuEST interface
 
 * Type `QuEST𝑥𝑦.QubitIdx` (exported): The element-type for arrays of qubits (a C-integer type)
 
+## Contributing
+
+You can contribute by:
+* Using QuEST_jl and reporting bugs by creating issues
+* Looking at & resolving some of the issues (this requires familiarity with QuEST)
+
+#### Contribution policies
+
+1. By creating a pull request, you agree to irrevocably license your contribution under the MIT license to the whole universe.
+2. To contribute, fork the repository, then create a pull request. In the pull request, note the issue that you're addressing.
+
+#### Code policy
+
+* Type everything you can!
 
 
 ## Version History
