@@ -61,11 +61,23 @@ precision, until you stop Julia.
 
 ## Documentation
 
-We refer to QuEST for the documentation of all functions and types.
-
 In Julia:
 * The module `QuEST_jl.QuEST`*xx* contains all functions (`createQureg()` and whatnot)
 * The module `QuEST_jl.QuEST`*xx*`.QuEST_Types` contains all types (`Qureg` and whatnot)
+
+We refer to QuEST for the documentation of all functions and types.
+
+
+### Difference from documented QuEST behavior
+
+* `measureWithStats()`: instead of taking a reference to the probability, the Julia function
+  returns a tuple (outcome,probability)
+
+### Julia-extensions to the QuEST interface
+
+* Type `QuEST𝑥𝑦.QubitIdx` (exported): The element-type for arrays of qubits (a C-integer type)
+
+
 
 ## Version History
 

@@ -78,6 +78,7 @@ Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating po
 """
 module QuEST32
 export QuEST_Types
+export QubitIdx
 
 import .._dlopen_QuEST
 
@@ -96,7 +97,8 @@ module QuEST_Types  # 32 bit qreal
 
 end #^ module QuEST_Types
 
-const Qreal = Float32
+const QubitIdx = Cint
+const Qreal    = Float32
 @assert sizeof(Qreal)==sizeof(QuEST_Types.qreal)
 
 #
@@ -126,6 +128,7 @@ Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating po
 """
 module QuEST64
 export QuEST_Types
+export QubitIdx
 
 import .._dlopen_QuEST
 
@@ -144,7 +147,8 @@ module QuEST_Types  # 64 bit qreal
 
 end #^ module QuEST_Types
 
-const Qreal = Float64
+const QubitIdx = Cint
+const Qreal    = Float64
 @assert sizeof(Qreal)==sizeof(QuEST_Types.qreal)
 
 #

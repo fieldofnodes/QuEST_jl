@@ -4,6 +4,7 @@
 import .._QUEST_LIB
 
 function createQuESTEnv() :: QuEST_Types.QuESTEnv
+
     if _QUEST_LIB[]==Ptr{Cvoid}(0)
         QuEST_init()
     else
@@ -11,6 +12,7 @@ function createQuESTEnv() :: QuEST_Types.QuESTEnv
     end
 
     return ccall(:createQuESTEnv, QuEST_Types.QuESTEnv, () )
+
 end
 
 ####################################################################################################
@@ -22,44 +24,62 @@ end
 function createComplexMatrixN(numQubits ::Integer) ::QuEST_Types.ComplexMatrixN
     @assert 1 ≤ numQubits ≤ 50
 
-    return ccall(:createComplexMatrixN, QuEST_Types.ComplexMatrixN, (Cint,), Cint(numQubits))
+    return ccall(:createComplexMatrixN, QuEST_Types.ComplexMatrixN,
+                 (Cint,),
+                 numQubits)
 end
 
-function createDensityQureg(numQubits ::Integer, env ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
+function createDensityQureg(numQubits ::Integer,
+                            env       ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
     @assert 1 ≤ numQubits ≤ 50
-    return ccall(:createDensityQureg, QuEST_Types.Qureg, (Cint,QuEST_Types.QuESTEnv), Cint(numQubits), env)
+    return ccall(:createDensityQureg, QuEST_Types.Qureg,
+                 (Cint,     QuEST_Types.QuESTEnv),
+                 numQubits, env)
 end
 
 function createDiagonalOp(numQubits     :: Integer,
-    env           :: QuEST_Types.QuESTEnv)    :: QuEST_Types.DiagonalOp
-return ccall(:createDiagonalOp, QuEST_Types.DiagonalOp, (Cint, QuEST_Types.QuESTEnv), Cint(numQubits), env)
+                          env           :: QuEST_Types.QuESTEnv)    :: QuEST_Types.DiagonalOp
+    return ccall(:createDiagonalOp, QuEST_Types.DiagonalOp,
+                 (Cint,     QuEST_Types.QuESTEnv),
+                 numQubits, env)
 end
 
 function createPauliHamil(numQubits     :: Integer,
-    numSumTerms   :: Integer)     :: QuEST_Types.PauliHamil
-return ccall(:createPauliHamil, QuEST_Types.PauliHamil, (Cint, Cint), Cint(numQubits), Cint(numSumTerms))
+                          numSumTerms   :: Integer)     :: QuEST_Types.PauliHamil
+    return ccall(:createPauliHamil, QuEST_Types.PauliHamil,
+                 (Cint, Cint),
+                 numQubits, numSumTerms)
 end
 
 
-function createPauliHamilFromFile(fn        ::String)   :: QuEST_Types.PauliHamil
-    return ccall(:createPauliHamilFromFile, QuEST_Types.PauliHamil, (Cstring,), fn)
+function createPauliHamilFromFile(filename ::String)   :: QuEST_Types.PauliHamil
+    return ccall(:createPauliHamilFromFile, QuEST_Types.PauliHamil,
+                 (Cstring,),
+                 filename)
 end
 
-function createQureg(numQubits ::Integer, env ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
+function createQureg(numQubits ::Integer,
+                     env       ::QuEST_Types.QuESTEnv) ::QuEST_Types.Qureg
     @assert 1 ≤ numQubits ≤ 50
 
-    return ccall(:createQureg, QuEST_Types.Qureg, (Cint,QuEST_Types.QuESTEnv), Cint(numQubits), env)
+    return ccall(:createQureg, QuEST_Types.Qureg,
+                 (Cint,     QuEST_Types.QuESTEnv),
+                 numQubits, env)
 end
 
 function destroyComplexMatrixN(M ::QuEST_Types.ComplexMatrixN) ::Nothing
-    ccall(:destroyComplexMatrixN, Cvoid, (QuEST_Types.ComplexMatrixN,), M)
+    ccall(:destroyComplexMatrixN, Cvoid,
+          (QuEST_Types.ComplexMatrixN,),
+          M)
     nothing
 end
 
 function destroyDiagonalOp(op       :: QuEST_Types.DiagonalOp,
                            env      :: QuEST_Types.QuESTEnv)    :: Nothing
-    ccall(:destroyDiagonalOp, Cvoid, (QuEST_Types.DiagonalOp, QuEST_Types.QuESTEnv), op, env)
-return nothing
+    ccall(:destroyDiagonalOp, Cvoid,
+          (QuEST_Types.DiagonalOp, QuEST_Types.QuESTEnv),
+          op,                      env)
+    return nothing
 end
 
 function destroyPauliHamil(hamil        ::QuEST_Types.PauliHamil)   :: Nothing
