@@ -3,33 +3,31 @@
 
 function  collapseToOutcome(qureg        ::QuEST_Types.Qureg,
                             measureQubit ::Integer,
-                            outcome      ::Integer)   ::Float64
+                            outcome      ::Integer)   ::Qreal
 
-    p = ccall(:collapseToOutcome,
-              Qreal,
-              (QuEST_Types.Qureg, Cint, Cint),
-              qureg,
-              Cint(measureQubit),
-              IntCint32(outcome))
-    return p
+    return ccall(:collapseToOutcome, Qreal,
+                 (QuEST_Types.Qureg, Cint,         Cint),
+                 qureg,              measureQubit, outcome)
 end
 
-function measure(qureg ::QuEST_Types.Qureg, measureQubit ::Integer) ::Int32
-    i = ccall(:measure, Cint, (QuEST_Types.Qureg, Cint), qureg, Cint(measureQubit))
-    return i
+function measure(qureg        ::QuEST_Types.Qureg,
+                 measureQubit ::Integer)            ::Int
+    return ccall(:measure, Cint,
+                 (QuEST_Types.Qureg, Cint),
+                 qureg,              measureQubit)
 end
 
 function measureWithStats(qureg             ::QuEST_Types.Qureg,
-                          measureQubit      ::Integer,
-                          outcomeProb       ::Vector{Qreal}) ::Int32
+                          measureQubit      ::Integer)            :: Tuple{Int,Qreal}
 
-    outcome = ccall(:measureWithStats,
-                    Cint,
-                    (QuEST_Types.Qureg, Cint, Ptr{Qreal}),
-                    qureg,
-                    Cint(measureQubit),
-                    outcomeProb)
-    return outcome
+    outcomeProb = Ref{Qreal}(-1)
+
+    outcome = ccall(:measureWithStats, Cint,
+                    (QuEST_Types.Qureg, Cint,            Ref{Qreal}),
+                    qureg,              measureQubit,    outcomeProb)
+
+    return outcome, outcomeProb[]
+
 end
 
 #EOF
