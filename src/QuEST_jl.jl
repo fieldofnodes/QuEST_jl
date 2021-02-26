@@ -69,6 +69,34 @@ function _dlclose_QuEST() ::Nothing
     nothing;
 end
 
+"""
+Functions `_quest_mtx_𝑛()` for 𝑛 ∈ {2,4} — convert Julia matrix into QuEST matrix
+"""
+function _quest_mtx_2(U ::Matrix{Complex{FLT}}) ::QuEST_Types.ComplexMatrix2 where FLT <: Real
+    @assert size(U) == (2,2)
+    u = QuEST_Types.ComplexMatrix2(
+        ( (real(U[1,1]), real(U[1,2])), (real(U[2,1]), real(U[2,2])) ),
+        ( (imag(U[1,1]), imag(U[1,2])), (imag(U[2,1]), imag(U[2,2])) )  )
+    return u
+end
+
+"""
+Functions `_quest_mtx_𝑛()` for 𝑛 ∈ {2,4} — convert Julia matrix into QuEST matrix
+"""
+function _quest_mtx_4(U ::Matrix{Complex{FLT}}) ::QuEST_Types.ComplexMatrix4 where FLT <: Real
+    @assert size(U) = (4,4)
+    u = QuEST_Types.ComplexMatrix4(
+        ( ( real(U[1,1]), real(U[1,2]), real(U[1,3]), real(U[1,4]) ),
+          ( real(U[2,1]), real(U[2,2]), real(U[2,3]), real(U[2,4]) ),
+          ( real(U[3,1]), real(U[3,2]), real(U[3,3]), real(U[3,4]) ),
+          ( real(U[4,1]), real(U[4,2]), real(U[4,3]), real(U[4,4]) ) ),
+        ( ( imag(U[1,1]), imag(U[1,2]), imag(U[1,3]), imag(U[1,4]) ),
+          ( imag(U[2,1]), imag(U[2,2]), imag(U[2,3]), imag(U[2,4]) ),
+          ( imag(U[3,1]), imag(U[3,2]), imag(U[3,3]), imag(U[3,4]) ),
+          ( imag(U[4,1]), imag(U[4,2]), imag(U[4,3]), imag(U[4,4]) ) )  )
+end
+
+
 ################################################################################
 # 32 bit QuEST
 ################################################################################
@@ -78,6 +106,7 @@ Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating po
 """
 module QuEST32
 export QuEST_Types
+export QubitIdx
 
 import .._dlopen_QuEST
 
@@ -96,7 +125,8 @@ module QuEST_Types  # 32 bit qreal
 
 end #^ module QuEST_Types
 
-const Qreal = Float32
+const QubitIdx = Cint
+const Qreal    = Float32
 @assert sizeof(Qreal)==sizeof(QuEST_Types.qreal)
 
 #
@@ -126,6 +156,7 @@ Module `QuEST`𝑥𝑦 — Julia wrapper for QuEST with 𝑥𝑦-bit floating po
 """
 module QuEST64
 export QuEST_Types
+export QubitIdx
 
 import .._dlopen_QuEST
 
@@ -144,7 +175,8 @@ module QuEST_Types  # 64 bit qreal
 
 end #^ module QuEST_Types
 
-const Qreal = Float64
+const QubitIdx = Cint
+const Qreal    = Float64
 @assert sizeof(Qreal)==sizeof(QuEST_Types.qreal)
 
 #

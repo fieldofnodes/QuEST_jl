@@ -48,25 +48,23 @@ function reportState(qureg ::QuEST_Types.Qureg) ::Nothing
     return nothing
 end
 
-function reportStateToScreen(qureg ::QuEST_Types.Qureg, env ::QuEST_Types.QuESTEnv, reportRank ::Integer) ::Nothing
+function reportStateToScreen(qureg      ::QuEST_Types.Qureg,
+                             env        ::QuEST_Types.QuESTEnv,
+                             reportRank ::Integer)              ::Nothing
     ccall(:reportStateToScreen,
           Cvoid,
           (QuEST_Types.Qureg, QuEST_Types.QuESTEnv, Cint),
-          qureg,
-          env,
-          Cint(reportRank))
-
-    return nothing
+          qureg,              env,                  reportRank)
+    nothing
 end
 
 function seedQuEST(seedarray ::Base.Vector{Clong}) ::Nothing
 
     @assert  ! isempty(seedarray)
 
-    ccall(:seedQuESTDefault,
-          Cvoid, (Ptr{Clong}, Cint),
-          Clong.(seedarray),
-          Cint(length(seedarray)))
+    ccall(:seedQuESTDefault, Cvoid,
+          (Ptr{Clong}, Cint),
+          seedarray,          length(seedarray))
     return nothing
 end
 
@@ -76,12 +74,16 @@ function seedQuESTDefault() ::Nothing
 end
 
 function syncQuESTEnv(env ::QuEST_Types.QuESTEnv) ::Nothing
-    ccall(:syncQuESTEnv, Cvoid, (QuEST_Types.QuESTEnv,), env)
+    ccall(:syncQuESTEnv, Cvoid,
+          (QuEST_Types.QuESTEnv,),
+          env)
     return nothing
 end
 
 function syncQuESTSuccess(successCode       ::Integer)       ::Cint
-    return ccall(:syncQuESTSuccess, Cint, (Cint,), Cint(successCode))
+    return ccall(:syncQuESTSuccess, Cint,
+                 (Cint,),
+                 successCode)
 end
 
 #EOF
