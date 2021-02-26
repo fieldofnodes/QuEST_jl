@@ -1,0 +1,8 @@
+LibTemplate.jl
+QuEST/
+build_setup.jl
+ctypes.jl
+questclang_api_32.jl
+questclang_api_64.jl
+questclang_common_32.jl
+questclang_common_64.jl
