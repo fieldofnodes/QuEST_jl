@@ -29,7 +29,7 @@ function _auxBuild(makePrecision ::Int, precision ::String ; isWindows ::Bool) :
         run(`cmake -DPRECISION=$makePrecision .. -G "MinGW Makefiles"`; wait=true)
 
         questclang_include = joinpath("..","QuEST","include") |> normpath
-        questclang_headers = [ joinpath(questclang_include,header)   for header in readdir(questclang_include) if endswith(header, ".h")]
+        questclang_headers = [ joinpath(questclang_include,header)   for header in ["QuEST.h","QuEST_precision.h"] ] #readdir(questclang_include) if endswith(header, ".h")]
         wc = init(; headers = questclang_headers,
                   output_file = joinpath(@__DIR__, "questclang_api_"*precision*".jl"),
                   common_file = joinpath(@__DIR__, "questclang_common_"*precision*".jl"),
@@ -45,7 +45,7 @@ function _auxBuild(makePrecision ::Int, precision ::String ; isWindows ::Bool) :
         run(`cmake -DPRECISION=$makePrecision ..` ; wait=true)
 
         questclang_include = joinpath("..","QuEST","include") |> normpath
-        questclang_headers = [ joinpath(questclang_include,header)   for header in readdir(questclang_include) if endswith(header, ".h")]
+        questclang_headers = [ joinpath(questclang_include,header)   for header in ["QuEST.h","QuEST_precision.h"] ] # readdir(questclang_include) if endswith(header, ".h")]
         wc = init(; headers = questclang_headers,
                   output_file = joinpath(@__DIR__, "questclang_api_"*precision*".jl"),
                   common_file = joinpath(@__DIR__, "questclang_common_"*precision*".jl"),
