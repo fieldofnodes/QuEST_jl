@@ -76,6 +76,11 @@ function setAmps(qureg        ::QuEST_Types.Qureg,
           qureg,              startIdx,  amps_real,  amps_imag,  numAmps)
 end
 
+
+
+const __ℂ     = QuEST_Types.Complex
+const __Qureg = QuEST_Types.Qureg
+
 function setWeightedQureg(factor1    ::Complex{Qreal},
                           qureg1     ::QuEST_Types.Qureg,
                           factor2    ::Complex{Qreal},
@@ -86,14 +91,11 @@ function setWeightedQureg(factor1    ::Complex{Qreal},
     @assert Bool(qureg1.isDensityMatrix) == Bool(qureg2.isDensityMatrix) == Bool(quregOut.isDensityMatrix)
     @assert qureg1.numQubitsRepresented  == qureg2.numQubitsRepresented  == quregOut.numQubitsRepresented
 
-    local ℂ     = QuEST_Types.Complex
-    local Qureg = QuEST_Types.Qureg
-
-    local factor1_quest   = ℂ(real(factor1  ),imag(factor1  ))
-    local factor2_quest   = ℂ(real(factor2  ),imag(factor2  ))
-    local factorOut_quest = ℂ(real(factorOut),imag(factorOut))
+    local factor1_quest   = __ℂ(real(factor1  ),imag(factor1  ))
+    local factor2_quest   = __ℂ(real(factor2  ),imag(factor2  ))
+    local factorOut_quest = __ℂ(real(factorOut),imag(factorOut))
 
     ccall(:setWeightedQureg, Cvoid,
-          (ℂ,            Qureg,   ℂ,             Qureg,  ℂ,               Qureg),
-          factor1_quest, qureg1,  factor2_quest, qureg2, factorOut_quest, quregOut)
+          (__ℂ,          __Qureg,  __ℂ,           __Qureg, __ℂ,             __Qureg),
+          factor1_quest, qureg1,   factor2_quest, qureg2,  factorOut_quest, quregOut)
 end
