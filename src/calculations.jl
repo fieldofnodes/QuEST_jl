@@ -39,7 +39,7 @@ function calcExpecPauliProd(qureg        ::QuEST_Types.Qureg,
                             workspace    ::QuEST_Types.Qureg)          ::Qreal
 
     @assert length(targetQubits) == length(pauliCodes)
-    @assert all( σ -> 0 ≤ σ ≤ 3,   pauliCodes )
+    #@assert all( σ -> 0 ≤ σ ≤ 3,   pauliCodes )
 
     expval = ccall(:calcExpecPauliProd,
                    Qreal,
@@ -59,7 +59,7 @@ function calcExpecPauliSum(qureg         ::QuEST_Types.Qureg,
                            workspace     ::QuEST_Types.Qureg)          ::Float64
 
     @assert length(allPauliCodes) ==  length(termCoeffs) * getNumQubits(qureg)
-    @assert all( σ -> 0 ≤ σ ≤ 3,  allPauliCodes )
+    #@assert all( σ -> 0 ≤ σ ≤ 3,  allPauliCodes )
 
     ex = ccall(:calcExpecPauliSum,
                Qreal,

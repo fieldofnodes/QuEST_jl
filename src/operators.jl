@@ -60,7 +60,7 @@ function applyMultiControlledMatrixN(qureg          :: QuEST_Types.Qureg,
           qureg,
           Cint.(ctrls),
           Cint(numCtrls),
-          Cint(targs),
+          Cint.(targs),
           Cint(numTargs),
           u)
     nothing;
@@ -80,7 +80,7 @@ function applyPauliSum(inQureg        ::QuEST_Types.Qureg,
                        numSumTerms    ::Integer,
                        outQureg       ::QuEST_Types.Qureg)          ::Nothing
 
-    @assert length(termCoeffs) == numSumTerms * getNumQubits(inQureg)
+    @assert length(allPauliCodes) == numSumTerms * getNumQubits(inQureg)
 
     ccall(:applyPauliSum,
           Cvoid,

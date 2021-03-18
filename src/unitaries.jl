@@ -31,7 +31,7 @@ function controlledCompactUnitary(qureg          ::QuEST_Types.Qureg,
 
     ccall(:controlledCompactUnitary,
           Cvoid,
-          (QuEST_Types.Qureg, Cint, Cint, Complex, Complex),
+          (QuEST_Types.Qureg, Cint, Cint, QuEST_Types.Complex, QuEST_Types.Complex),
           qureg,
           Cint(controlQubit),
           Cint(targetQubit),
@@ -116,7 +116,7 @@ function controlledRotateAroundAxis(qureg        ::QuEST_Types.Qureg,
     targetQubit  ::Integer,
     angle        ::Qreal,
     axis         ::Vector{Qreal})  ::Nothing
-@assert length axis == 3
+@assert length(axis) == 3
 q_axis = QuEST_Types.Vector(axis[1], axis[2], axis[3])
 ccall(:controlledRotateAroundAxis,
 Cvoid,
@@ -184,7 +184,7 @@ function _quest_mtx_2(U ::Matrix{Complex{Qreal}}) ::QuEST_Types.ComplexMatrix2
 end
 
 function _quest_mtx_4(U ::Matrix{Complex{Qreal}}) ::QuEST_Types.ComplexMatrix4
-    @assert size(U) = (4,4)
+    @assert size(U) == (4,4)
     u = QuEST_Types.ComplexMatrix4( ( ( real(U[1,1]), real(U[1,2]), real(U[1,3]), real(U[1,4]) ),
                           ( real(U[2,1]), real(U[2,2]), real(U[2,3]), real(U[2,4]) ),
                           ( real(U[3,1]), real(U[3,2]), real(U[3,3]), real(U[3,4]) ),
@@ -201,7 +201,7 @@ function controlledTwoQubitUnitary(qureg         ::QuEST_Types.Qureg,
     targetQubit2  ::Integer,
     U             ::Matrix{Complex{Qreal}}) ::Nothing
 
-@assert size(U) == (2, 2)
+@assert size(U) == (4, 4)
 u = _quest_mtx_4(U)
 ccall(:controlledTwoQubitUnitary,
 Cvoid,
@@ -336,7 +336,7 @@ function multiRotatePauli(qureg         ::QuEST_Types.Qureg,
                           angle         ::Qreal)          ::Nothing
 
     @assert length(targetQubits) == length(targetPaulis)
-    @assert all( σ -> 0 ≤ σ ≤ 3,   targetPaulis )
+    #@assert all( σ -> 0 ≤ σ ≤ 3,   targetPaulis )
 
     ccall(:multiRotatePauli,
           Cvoid,
@@ -434,7 +434,7 @@ function rotateAroundAxis(qureg         ::QuEST_Types.Qureg,
                           angle         ::Qreal,
                           axis          ::Vector{Qreal}) ::Nothing
 
-    @assert length axis == 3
+    @assert length(axis) == 3
     q_axis = QuEST_Types.Vector(axis[1], axis[2], axis[3])
     ccall(:rotateAroundAxis,
           Cvoid,

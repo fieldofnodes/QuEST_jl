@@ -10,7 +10,7 @@ function  collapseToOutcome(qureg        ::QuEST_Types.Qureg,
               (QuEST_Types.Qureg, Cint, Cint),
               qureg,
               Cint(measureQubit),
-              IntCint32(outcome))
+              Cint(outcome))
     return p
 end
 

@@ -3,7 +3,7 @@
 
 function cloneQureg(targetQureg ::QuEST_Types.Qureg, copyQureg ::QuEST_Types.Qureg) ::Nothing
 
-    return ccall(:createCloneQureg, Cvoid, (QuEST_Types.Qureg, QuEST_Types.Qureg), targetQureg, copyQureg)
+    return ccall(:cloneQureg, Cvoid, (QuEST_Types.Qureg, QuEST_Types.Qureg), targetQureg, copyQureg)
 
 end
 
@@ -65,7 +65,7 @@ function setAmps(qureg                  ::QuEST_Types.Qureg,
                  numAmps                ::Integer)          :: Nothing
 
     @assert length(amps) == numAmps
-    @assert numAmps + startIdx <= qureg.numQubitsInStateVec
+    @assert numAmps + startIdx <= 2^qureg.numQubitsInStateVec
     reals = Vector{Qreal}([real(x) for x in amps])
     imags = Vector{Qreal}([imag(x) for x in amps])
 
@@ -91,11 +91,11 @@ function setWeightedQureg(fac1   ::Complex{Qreal},
     ccall(:setWeightedQureg,
           Cvoid,
           (QuEST_Types.Complex, QuEST_Types.Qureg, QuEST_Types.Complex, QuEST_Types.Qureg, QuEST_Types.Complex, QuEST_Types.Qureg),
-          QuEST_Types.Complex(Qreal(real(fac1)),Qreal(real(fac1))),
+          QuEST_Types.Complex(real(fac1), imag(fac1) ),
           qureg1,
-          QuEST_Types.Complex(Qreal(real(fac2)),Qreal(real(fac2))),
+          QuEST_Types.Complex(real(fac2), imag(fac2)),
           qureg2,
-          QuEST_Types.Complex(Qreal(real(facOut)),Qreal(real(facOut))),
+          QuEST_Types.Complex(real(facOut), imag(facOut)),
           out)
 
     return nothing
