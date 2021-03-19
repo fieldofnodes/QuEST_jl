@@ -283,6 +283,8 @@ function test_PauliHaiml()
             end
         end
 
+        rm("hamil")
+
 
 
     end
