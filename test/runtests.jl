@@ -3301,7 +3301,7 @@ function test_reportPauliHamil()
                QuEST.QuEST_Types.PAULI_Y, 
                QuEST.QuEST_Types.PAULI_Z]
     env= QuEST.createQuESTEnv()
-    for i=1:1
+    for i=1:10
 
         numQubits = rand(3:12)
         numSumTerms = rand(1:20)
@@ -3320,20 +3320,29 @@ function test_reportPauliHamil()
         Base.Libc.flush_cstdio()
         redirect_stdout(original_stdout)
         close(write_pipe)
-        for l =1:numSumTerms + 1
+        for l =1:numSumTerms+1
             push!(lines, readline(read_pipe))
         end
 
-        for row = 0:numSumTerms
-            coeff_str = split(lines[row+1], "\t")[1]
-            codes_str = split(lines[row+1], "\t")[2]
-            codes_list = split(codes_str, " ")
-            @test length(codes_list) == (numQubits)
-            @test parse(qreal, coeff_str) ≈ coeffs[row+1]
+        for row = 0:numSumTerms-1
+            if occursin("\t", lines[row+1])
+                coeff_str = split(lines[row+1], "\t")[1]
+                codes_str = split(lines[row+1], "\t")[2]
+                codes_list = split(codes_str, " ")
+            else
+                coeff_str = split(lines[row+1], " ")[1]
+                codes_list = split(lines[row+1], " ")[2:end]
+            end
+            
+            #print(codes_list)
+            @test length(codes_list) == (numQubits+1)
+            @test isapprox(parse(qreal, coeff_str), coeffs[row+1], atol=1e-5)
             for q = 1:numQubits
-                @test paulies((Cint, codes_list[q])) == codes[row*numQubits + q]
+                @test paulies[parse(Cint, codes_list[q])+1] == codes[row*numQubits + q]
             end
         end
+
+        @test lines[end] == ""
 
         
 
@@ -3342,109 +3351,226 @@ function test_reportPauliHamil()
 
     QuEST.destroyQuESTEnv(env)
 end
+
+function test_report()
+
+    env= QuEST.createQuESTEnv()
+    QuEST.reportQuESTEnv(env)
+    numQubits = rand(3:12)
+    qureg = QuEST.createQureg(numQubits, env)
+
+    original_stdout = stdout
+    read_pipe, write_pipe = redirect_stdout()
+    lines = Vector{String}()
+    QuEST.reportQuregParams(qureg)
+    Base.Libc.flush_cstdio()
+    redirect_stdout(original_stdout)
+    close(write_pipe)
+    for l =1:5
+        push!(lines, readline(read_pipe))
+    end
+
+    @test lines[1] == "QUBITS:"
+    @test lines[2] == "Number of qubits is $numQubits."
+    @test lines[3] == "Number of amps is $(2^numQubits)."
+    @test lines[5] == ""
+
+    QuEST.destroyQureg(qureg, env)
+    QuEST.destroyQuESTEnv(env)
+end
+
+function test_reportState()
+    env= QuEST.createQuESTEnv()
+    for i=1:1
+        numQubits = rand(3:5)
+        qureg = QuEST.createQureg(numQubits, env)
+        state = rand(Complex{qreal}, 2^numQubits)
+        state /= norm(state)
+        QuEST.initStateFromAmps(qureg, state)
+
+        original_stdout = stdout
+        read_pipe, write_pipe = redirect_stdout()
+        lines = Vector{String}()
+        QuEST.reportStateToScreen(qureg, env, 1)
+        Base.Libc.flush_cstdio()
+        redirect_stdout(original_stdout)
+        close(write_pipe)
+        for l =1:2^numQubits+4
+            push!(lines, readline(read_pipe))
+        end
+        @test lines[2] == "real, imag"
+        @test lines[end-1] == "]"
+        @test lines[end] == ""
+        for l =1:2^numQubits
+            this_re = parse(qreal, split(lines[l+2], " ")[1][1:end-1])
+            this_im = parse(qreal, split(lines[l+2], " ")[2])
+            @test this_im ≈ imag(state[l])
+            @test this_re ≈ real(state[l])
+        end
+
+        QuEST.reportState(qureg)
+
+        io = open("state_rank_0.csv", "r")
+
+        @test readline(io) == "real, imag"
+
+        for l=1:2^numQubits
+            this_line = readline(io)
+            this_re = parse(qreal, split(this_line, " ")[1][1:end-1])
+            this_im = parse(qreal, split(this_line, " ")[2])
+            @test this_im ≈ imag(state[l])
+            @test this_re ≈ real(state[l])
+        end
+
+        @test readline(io) == ""
+        
+        close(io)
+
+        rm("state_rank_0.csv")
+
+    end
+
+    QuEST.destroyQuESTEnv(env)
+    
+end
+
+function test_seed()
+    env= QuEST.createQuESTEnv()
+
+    num_seeds = rand(1:30)
+    seeds = rand(Culong, num_seeds)
+    QuEST.seedQuESTDefault()
+    QuEST.seedQuEST(seeds)
+
+    QuEST.destroyQuESTEnv(env)
+
+end
+
+function test_sync()
+    env= QuEST.createQuESTEnv()
+    numQubits = rand(3:12)
+    qureg = QuEST.createQureg(numQubits, env)
+    state = rand(Complex{qreal}, 2^numQubits)
+    state /= norm(state)
+    QuEST.initStateFromAmps(qureg, state)
+
+    QuEST.syncQuESTEnv(env)
+    @test QuEST.syncQuESTSuccess(1) == 1
+
+    QuEST.destroyQureg(qureg, env)
+    QuEST.destroyQuESTEnv(env)
+
+end
 @testset "QuEST.jl" begin
-    #test_env()
-    #test_qureg()
-    #test_qureg_density()
-    #check_createCloneQureg()
-    #check_ComplexMatrixN()
-    #test_DiagonalOp()
-    #test_PauliHaiml()
-    #test_compactUnitary()
-    #test_controlledCompactUnitary()
-    #test_controlledMultiQubitUnitary()
-    #test_controlledNot()
-    #test_controlledPauliY()
-    #test_controlledPhaseFlip()
-    #test_controlledPhaseShift()
-    #test_controlledRotateAroundAxis()
-    #test_controlledRotateX()
-    #test_controlledRotateY()
-    #test_controlledRotateZ()
-    #test_controlledTwoQubitUnitary()
-    #test_controlledUnitary()
-    #test_hadamard()
-    #test_multiControlledMultiQubitUnitary()
-    #test_multiControlledPhaseFlip()
-    #test_multiControlledPhaseShift()
-    #test_multiControlledTwoQubitUnitary()
-    #test_multiControlledUnitary()
-    #test_multiQubitUnitary()
-    #test_multiRotatePauli()
-    #test_multiRotateZ()
-    #test_multiStateControlledUnitary()
-    #test_pauliX()
-    #test_pauliY()
-    #test_pauliZ()
-    #test_phaseShift()
-    #test_rotateAroundAxis()
-    #test_rotateX()
-    #test_rotateY()
-    #test_rotateZ()
-    #test_sGate()
-    #test_sqrtSwapGate()
-    #test_swapGate()
-    #test_tGate()
-    #test_twoQubitUnitary()
-    #test_unitary()
+    test_env()
+    test_qureg()
+    test_qureg_density()
+    check_createCloneQureg()
+    check_ComplexMatrixN()
+    test_DiagonalOp()
+    test_PauliHaiml()
+    test_compactUnitary()
+    test_controlledCompactUnitary()
+    test_controlledMultiQubitUnitary()
+    test_controlledNot()
+    test_controlledPauliY()
+    test_controlledPhaseFlip()
+    test_controlledPhaseShift()
+    test_controlledRotateAroundAxis()
+    test_controlledRotateX()
+    test_controlledRotateY()
+    test_controlledRotateZ()
+    test_controlledTwoQubitUnitary()
+    test_controlledUnitary()
+    test_hadamard()
+    test_multiControlledMultiQubitUnitary()
+    test_multiControlledPhaseFlip()
+    test_multiControlledPhaseShift()
+    test_multiControlledTwoQubitUnitary()
+    test_multiControlledUnitary()
+    test_multiQubitUnitary()
+    test_multiRotatePauli()
+    test_multiRotateZ()
+    test_multiStateControlledUnitary()
+    test_pauliX()
+    test_pauliY()
+    test_pauliZ()
+    test_phaseShift()
+    test_rotateAroundAxis()
+    test_rotateX()
+    test_rotateY()
+    test_rotateZ()
+    test_sGate()
+    test_sqrtSwapGate()
+    test_swapGate()
+    test_tGate()
+    test_twoQubitUnitary()
+    test_unitary()
 
     ##############
     ##############
 
-    #test_collapseToOutcome()
-    #test_measure()
-    #test_measureWithStats()
-    #test_DiagonalOp()
-    #test_applyMatrix2()
-    #test_applyMatrix4()
-    #test_applyMatrixN()
-    #test_applyMultiControlledMatrixN()
-    #test_applyPauliHamil()
-    #test_applyPauliSum()
-    #test_applyTrotterCircuit()
+    test_collapseToOutcome()
+    test_measure()
+    test_measureWithStats()
+    test_DiagonalOp()
+    test_applyMatrix2()
+    test_applyMatrix4()
+    test_applyMatrixN()
+    test_applyMultiControlledMatrixN()
+    test_applyPauliHamil()
+    test_applyPauliSum()
+    test_applyTrotterCircuit()
 
     #####################
     #####################
 
-    #test_calcDensityInnerProduct()
-    #test_calcExpecDiagonalOp()
-    #test_calcExpecPauliHamil()
-    #test_calcExpecPauliProd()
-    #test_calcExpecPauliSum()
-    #test_calcFidelity()
-    #test_calcHilbertSchmidtDistance()
-    #test_calcInnerProduct()
-    #test_calcProbOfOutcome()
-    #test_calcPurity()
-    #test_calcTotalProb()
-    #test_amp_funcs()
-    #test_getDensityAmp()
+    test_calcDensityInnerProduct()
+    test_calcExpecDiagonalOp()
+    test_calcExpecPauliHamil()
+    test_calcExpecPauliProd()
+    test_calcExpecPauliSum()
+    test_calcFidelity()
+    test_calcHilbertSchmidtDistance()
+    test_calcInnerProduct()
+    test_calcProbOfOutcome()
+    test_calcPurity()
+    test_calcTotalProb()
+    test_amp_funcs()
+    test_getDensityAmp()
 
     ####################
     ####################
 
-    #test_cloneQureg()
-    #test_initBlankState()
-    #test_initClassicalState()
-    #test_initPlusState()
-    #test_initPureState()
-    #test_initStateFromAmps()
-    #test_initZeroState()
-    #test_setAmps()
-    #test_setWeightedQureg()
+    test_cloneQureg()
+    test_initBlankState()
+    test_initClassicalState()
+    test_initPlusState()
+    test_initPureState()
+    test_initStateFromAmps()
+    test_initZeroState()
+    test_setAmps()
+    test_setWeightedQureg()
 
     #################
     #################
 
-    #test_QASM()
+    test_QASM()
 
     ################
     ################
 
-    #test_GPU()
-    #test_initDebugState()
-    #test_reportPauliHamil()
+    test_GPU()
+    test_initDebugState()
     test_reportPauliHamil()
+    test_reportPauliHamil()
+    test_report()
+    test_reportState()
+    test_seed()
+    test_sync()
+
+    ################
+    ################
 
 
 
