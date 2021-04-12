@@ -97,12 +97,62 @@ function destroyQureg(qureg ::QuEST_Types.Qureg, env ::QuEST_Types.QuESTEnv) ::N
     return nothing
 end
 
-function initComplexMatrixN(m       ::QuEST_Types.ComplexMatrixN,
-                            m_j     ::Matrix{Base.Complex})    ::Nothing
+@doc raw"
+Function `make_QuEST_matrix(M ::Matrix{Qreal}) ::ComplexMatrixN`
+Convenience function for creating (`createComplexMatrixN()`) and filling a QuEST matrix data structure (`struct ComplexMatrixN`).
+### Input
+* `M` must be a 2ⁿ×2ⁿ matrix for 1 ≤ 𝑛 ≤ 50 (haha) [`@assert`]
+### Return value
+* An 𝑛 qubit matrix.
+"
+function make_QuEST_matrix(M ::Matrix{Base.Complex{Qreal}}) ::QuEST_Types.ComplexMatrixN
+    (R,C) = size(M)
+    @assert R==C
+    @assert R ≥ 2
+    numQubits = Int(round( log2(R) ))
+    @assert 2^numQubits == R
+    @assert 1 ≤ numQubits ≤ 50
 
-    @assert 1<<m.numQubits == size(m_j)[1] == size(m_j)[1]
-    real_ = Matrix{Qreal}(transpose(Qreal.(real(m_j))))
-    imag_ = Matrix{Qreal}(transpose(Qreal.(imag(m_j))))
+    MQ = createComplexMatrixN(numQubits)
+    for c = 1:R                       # Julia is column major
+        for r = 1:R
+            re_MQ_r = unsafe_load(MQ.real,r)
+            im_MQ_r = unsafe_load(MQ.imag,r)
+            unsafe_store!(re_MQ_r, real(M[r,c]), c)
+            unsafe_store!(im_MQ_r, imag(M[r,c]), c)
+        end
+    end
+    return MQ
+end
+
+@doc raw"
+Function
+     fill_ComplexMatrix!(M ::ComplexMatrixN, F ::Function) ::Nothing
+Fills the entries of `M`: ∀(k,ℓ): 𝑀[k,ℓ] = 𝐹(k,ℓ).
+(Indices are in 1, ..., 2ⁿ.)
+### Input
+* `M` must have been ''created'' (`createComplexMatrixN()`)
+### Output
+* Entries of `M` are overwritten.
+"
+function fill_ComplexMatrix!(M ::QuEST_Types.ComplexMatrixN, M_ ::Function) ::Nothing
+    N = 2^M.numQubits
+    for k = 1:N
+        re_M_k = unsafe_load(M.real,k)
+        im_M_k = unsafe_load(M.imag,k)
+        for ℓ = 1:N
+            unsafe_store!(re_M_k, real(M_(k,ℓ)), ℓ)
+            unsafe_store!(im_M_k, imag(M_(k,ℓ)), ℓ)
+        end
+    end
+    nothing
+end
+
+function initComplexMatrixN(m       ::QuEST_Types.ComplexMatrixN,
+                            real_   ::Vector{Qreal},
+                            imag_   ::Vector{Qreal})        :: Nothing
+
+    @assert 1<<(2*m.numQubits) == length(real_) == length(imag_)
     ccall(:initComplexMatrixN, Cvoid, (QuEST_Types.ComplexMatrixN, Ptr{Qreal}, Ptr{Qreal}), m, real_, imag_)
     return nothing
 end
@@ -111,7 +161,7 @@ function initDiagonalOp(op      :: QuEST_Types.DiagonalOp,
                         real_   :: Vector{Qreal},
                         imag_   :: Vector{Qreal})  ::Nothing
 
-    @assert 1<<op.numQubits == length(real_) == length(imag)
+    @assert 1<<op.numQubits == length(real_) == length(imag_)
     ccall(:initDiagonalOp, Cvoid, (QuEST_Types.DiagonalOp, Ptr{Qreal}, Ptr{Qreal}), op, real_, imag_)
     return nothing
 end

@@ -23,9 +23,15 @@ function controlledCompactUnitary(qureg          ::QuEST_Types.Qureg,
     alpha = QuEST_Types.Complex(real(α),imag(α))
     beta  = QuEST_Types.Complex(real(β),imag(β))
 
-    ccall(:controlledCompactUnitary, Cvoid,
-          (QuEST_Types.Qureg, Cint,         Cint,        Complex, Complex),
-          qureg,              controlQubit, targetQubit, alpha,   beta)
+    ccall(:controlledCompactUnitary,
+          Cvoid,
+          (QuEST_Types.Qureg, Cint, Cint, QuEST_Types.Complex, QuEST_Types.Complex),
+          qureg,
+          Cint(controlQubit),
+          Cint(targetQubit),
+          alpha,
+          beta)
+    return nothing
 end
 
 function controlledMultiQubitUnitary(qureg   ::QuEST_Types.Qureg,
@@ -150,17 +156,38 @@ function controlledRotateY(qureg         ::QuEST_Types.Qureg,
 end
 
 function controlledRotateZ(qureg         ::QuEST_Types.Qureg,
-                           controlQubit  ::Integer,
-                           targetQubit   ::Integer,
-                           angle         ::Qreal)  ::Nothing
+    controlQubit  ::Integer,
+    targetQubit   ::Integer,
+    angle         ::Qreal)  ::Nothing
 
-    @assert 0 ≤ controlQubit < qureg.numQubitsRepresented
-    @assert 0 ≤ targetQubit  < qureg.numQubitsRepresented
-    @assert controlQubit != targetQubit
+    ccall(:controlledRotateZ,
+          Cvoid,
+          (QuEST_Types.Qureg, Cint, Cint, Qreal),
+          qureg,
+          Cint(controlQubit),
+          Cint(targetQubit),
+          angle)
+return nothing
+end
 
-    ccall(:controlledRotateZ, Cvoid,
-          (QuEST_Types.Qureg, Cint,           Cint,          Qreal),
-          qureg,              controlQubit,   targetQubit,   angle)
+function _quest_mtx_2(U ::Matrix{Complex{Qreal}}) ::QuEST_Types.ComplexMatrix2
+    @assert size(U) == (2,2)
+    u = QuEST_Types.ComplexMatrix2(
+        ( (real(U[1,1]), real(U[1,2])), (real(U[2,1]), real(U[2,2])) ),
+        ( (imag(U[1,1]), imag(U[1,2])), (imag(U[2,1]), imag(U[2,2])) )  )
+    return u
+end
+
+function _quest_mtx_4(U ::Matrix{Complex{Qreal}}) ::QuEST_Types.ComplexMatrix4
+    @assert size(U) == (4,4)
+    u = QuEST_Types.ComplexMatrix4( ( ( real(U[1,1]), real(U[1,2]), real(U[1,3]), real(U[1,4]) ),
+                          ( real(U[2,1]), real(U[2,2]), real(U[2,3]), real(U[2,4]) ),
+                          ( real(U[3,1]), real(U[3,2]), real(U[3,3]), real(U[3,4]) ),
+                          ( real(U[4,1]), real(U[4,2]), real(U[4,3]), real(U[4,4]) ) ),
+                        ( ( imag(U[1,1]), imag(U[1,2]), imag(U[1,3]), imag(U[1,4]) ),
+                          ( imag(U[2,1]), imag(U[2,2]), imag(U[2,3]), imag(U[2,4]) ),
+                          ( imag(U[3,1]), imag(U[3,2]), imag(U[3,3]), imag(U[3,4]) ),
+                          ( imag(U[4,1]), imag(U[4,2]), imag(U[4,3]), imag(U[4,4]) ) )  )
 end
 
 function controlledTwoQubitUnitary(qureg         ::QuEST_Types.Qureg,
@@ -175,10 +202,17 @@ function controlledTwoQubitUnitary(qureg         ::QuEST_Types.Qureg,
     @assert targetQubit1 != targetQubit2
     @assert controlQubit ∉ [targetQubit1,targetQubit2]
 
+    @assert size(U) == (4, 4)
     u = _quest_mtx_4(U)
-    ccall(:controlledTwoQubitUnitary, Cvoid,
-          (QuEST_Types.Qureg, Cint,           Cint,           Cint,         QuEST_Types.ComplexMatrix4),
-          qureg,              controlQubit,   targetQubit1,   targetQubit2, u)
+    ccall(:controlledTwoQubitUnitary,
+          Cvoid,
+          (QuEST_Types.Qureg, Cint, Cint, Cint, QuEST_Types.ComplexMatrix4),
+          qureg,
+          Cint(controlQubit),
+          Cint(targetQubit1),
+          Cint(targetQubit2),
+          u)
+return nothing
 end
 
 
@@ -281,7 +315,7 @@ function multiRotatePauli(qureg         ::QuEST_Types.Qureg,
                           angle         ::Qreal)          ::Nothing
 
     @assert length(targetQubits) == length(targetPaulis)
-    @assert all( σ -> 0 ≤ σ ≤ 3,   targetPaulis )
+    #@assert all( σ -> 0 ≤ σ ≤ 3,   targetPaulis )
 
     ccall(:multiRotatePauli, Cvoid,
           (QuEST_Types.Qureg, Ptr{Cint},     Ptr{QuEST_Types.pauliOpType}, Cint,                 Qreal),

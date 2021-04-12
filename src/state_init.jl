@@ -1,12 +1,10 @@
 # QuEST_jl/src/base/state_init.jl
 #
 
-function cloneQureg(targetQureg ::QuEST_Types.Qureg,
-                    copyQureg   ::QuEST_Types.Qureg) ::Nothing
+function cloneQureg(targetQureg ::QuEST_Types.Qureg, copyQureg ::QuEST_Types.Qureg) ::Nothing
 
-    return ccall(:createCloneQureg, Cvoid,
-                 (QuEST_Types.Qureg, QuEST_Types.Qureg),
-                 targetQureg,        copyQureg)
+    return ccall(:cloneQureg, Cvoid, (QuEST_Types.Qureg, QuEST_Types.Qureg), targetQureg, copyQureg)
+
 end
 
 function initBlankState(qureg ::QuEST_Types.Qureg) ::Nothing

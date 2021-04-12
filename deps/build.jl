@@ -69,7 +69,7 @@ Clone repository, make, Clang
 """
 function build(;isWindows::Bool) ::Nothing
     @info "Cloning QuEST..."
-    run(`git clone https://github.com/Ketita/QuEST.git` ; wait=true)
+    run(`git clone https://github.com/TartuQC/QuEST.git` ; wait=true)
     cd("QuEST")
     @info "Build with 32-bit floats..."
     _auxBuild(1,"32" ; isWindows)
