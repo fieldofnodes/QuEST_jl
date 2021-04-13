@@ -7,6 +7,19 @@ scientific computing language [Julia](https://julialang.org/).
 
 ## Installation
 
+### Software needed for build and installation (Windows 10)
+* Git
+* Julia 5.4 (currently, `Clang_jl` does not work with Julia 6)
+* [CMAKE](https://cmake.org/download/) (added to path)
+* [make](https://community.chocolatey.org/packages/make) through [chocolatey](https://chocolatey.org/install) package manager
+* MSYS with `mingw-w64-x86_64-gcc` and `mingw-w64-x86_64-make` (add `msys64/mingw64/bin` to path). [Tutorial](https://www.youtube.com/watch?v=aXF4A5UeSeM)
+* You may need to start Julia from the Git Bash console.
+### Software needed for build and installation (Linux)
+* Git
+* Julia 5.4 (currently, `Clang_jl` does not work with Julia 6)
+* build-essential (or the equivalent in your Linux distribution)
+* CMAKE
+
 #### Non-expert QuEST users
 
 Download and build the Julia package like this:
