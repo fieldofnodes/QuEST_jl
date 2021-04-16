@@ -10,11 +10,9 @@ scientific computing language [Julia](https://julialang.org/).
 Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl with Julia 1.6, you have to jump through some hoops:
 
 ##### To use Julia 1.6...
-1. Git-clone QuEST_jl
-2. `] activate` it
-3. `(QuEST_jl) pkg> rm Clang`
-4. `(QuEST_jl) pkg> add "https://github.com/JuliaInterop/Clang.jl#master"`
-5. Build manually: `(QuEST_jl) pkg> build` as described below
+*Before* you `] add` QuEST_jl:
+1. `(@v1.6) pkg> add "https://github.com/TartuQC/Clang.jl"`
+2. `(@v1.6) pkg> add "https://github.com/TartuQC/QuEST_jl.git"`
 
 ## Installation
 
