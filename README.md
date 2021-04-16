@@ -1,13 +1,13 @@
-# DEV-BRANCH NOTES
+## Note on Julia 1.6
 
-**Remove all of these before merging into master!**
+Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl with Julia 1.6, you have to jump through some hoops:
 
 #### To use Julia 1.6...
 1. Git-clone QuEST_jl
 2. `] activate` it
 3. `(QuEST_jl) pkg> rm Clang`
 4. `(QuEST_jl) pkg> add "https://github.com/JuliaInterop/Clang.jl#master"`
-5. Build manually
+5. Build manually: `(QuEST_jl) pkg> build` as described below
 
 # QuEST_jl
 #### Julia wrapper for the Quantum Exact Simulation Toolkit (QuEST)
