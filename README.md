@@ -43,8 +43,6 @@ You do, however, need to have the necessary software on your system.
 * xcode
 * Julia 1.6 (from homebrew) with the hack above to get around the Clang.jl problem.
 
-Note on Apple silicon (e.g., MadcBook Air M1): It doesn't work currently.  Julia comes for x86 out of Homebrew, but the QuEST library is built by xcode for ARM, so Julia cannot load it.
-
 ##### Software requirements on Windows 10
 
 *We cannot make the Windows build work right now, as we don't know how to make make make a `.dll` file; see [issue # 10](https://github.com/TartuQC/QuEST_jl/issues/10).
@@ -91,8 +89,6 @@ terminate Julia, and start it again.
 
 ### Building QuEST_jl as "expert"
 
-**This hasn't been tested!**
-
 To activate "expert" mode, before building the QuEST_jl package, you have to set the environment variable
 ```{bash}
 export QUEST_JL_EXPERT_BUILD=1
@@ -101,8 +97,7 @@ export QUEST_JL_EXPERT_BUILD=1
 The value doesn't matter, the build process checks only *whether* the
 environment variable is set or not.
 
-If it is set, QuEST will *not* be cloned from GitHub.  Instead you are
-expected to make it available in your own, expertly tuned version.
+If it is set, QuEST will be cloned from GitHub, but not built.  Only the `.h`-files will be taken to auto-generate the C-inferface.  You need to have your own compiled version of QuEST available, and you have to make Julia find it.
 
 You need to make available for automatic loading two dynamically loaded libraries, with the names
 
@@ -112,6 +107,8 @@ You need to make available for automatic loading two dynamically loaded librarie
 As in the non-expert version, once you create a QuEST environment with
 a precision, the library is loaded, and Julia is bound to that
 precision, until you stop Julia.
+
+Note on Apple silicon (e.g., MadcBook Air M1): If you use Julia in x86-mode, you also have to build the QuEST library in x86-mode.  If you build it for ARM, Julia cannot load it across architectures.
 
 ## Documentation
 
