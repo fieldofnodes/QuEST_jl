@@ -59,7 +59,7 @@ You do, however, need to have the necessary software on your system.
 * You may need to start Julia from the Git Bash console.
 
 
-### Building instructions
+#### Building instructions
 
 Download and build the Julia package like this:
 
