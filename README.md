@@ -91,7 +91,7 @@ terminate Julia, and start it again.
 
 To activate "expert" mode, before building the QuEST_jl package, you have to set the environment variable
 ```{bash}
-export QUEST_JL_EXPERT_BUILD=1
+ QUEST_JL_EXPERT_BUILD=1
 ```
 
 The value doesn't matter, the build process checks only *whether* the
