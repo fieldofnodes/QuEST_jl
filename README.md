@@ -18,7 +18,7 @@ Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl w
 
 ## Installation
 
-There are two ways to build Quest_jl, depending on the person building it.
+There are two ways to build Quest_jl, depending on whether you want to tune QuEST to your hardware or are happy with the QuEST default make process.
 
 **Expert build** is intended for people who want to tune their QuEST installation to their hardware.
 An expert must download and build QuEST himself, and make it compatible with the QuEST_jl expert-build process, see below.
