@@ -5,11 +5,11 @@ This package makes available the high-performance quantum circuit
 simulator as a package in the the Matlab-like rapid-prototyping
 scientific computing language [Julia](https://julialang.org/).
 
-## Note on Julia 1.6
+### Note on Julia 1.6
 
 Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl with Julia 1.6, you have to jump through some hoops:
 
-#### To use Julia 1.6...
+##### To use Julia 1.6...
 1. Git-clone QuEST_jl
 2. `] activate` it
 3. `(QuEST_jl) pkg> rm Clang`
