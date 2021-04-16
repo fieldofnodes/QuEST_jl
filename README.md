@@ -1,3 +1,10 @@
+# QuEST_jl
+#### Julia wrapper for the Quantum Exact Simulation Toolkit (QuEST)
+
+This package makes available the high-performance quantum circuit
+simulator as a package in the the Matlab-like rapid-prototyping
+scientific computing language [Julia](https://julialang.org/).
+
 ## Note on Julia 1.6
 
 Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl with Julia 1.6, you have to jump through some hoops:
@@ -8,13 +15,6 @@ Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl w
 3. `(QuEST_jl) pkg> rm Clang`
 4. `(QuEST_jl) pkg> add "https://github.com/JuliaInterop/Clang.jl#master"`
 5. Build manually: `(QuEST_jl) pkg> build` as described below
-
-# QuEST_jl
-#### Julia wrapper for the Quantum Exact Simulation Toolkit (QuEST)
-
-This package makes available the high-performance quantum circuit
-simulator as a package in the the Matlab-like rapid-prototyping
-scientific computing language [Julia](https://julialang.org/).
 
 ## Installation
 
