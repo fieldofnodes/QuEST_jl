@@ -7,7 +7,30 @@ scientific computing language [Julia](https://julialang.org/).
 
 ## Installation
 
-#### Non-expert QuEST users
+
+### Non-expert QuEST users
+
+##### Software needed for build and installation (Windows 10)
+* Git
+* Julia 1.5.4 (currently,
+  [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
+  with Julia 1.6)
+* [CMAKE](https://cmake.org/download/) (added to path)
+* [make](https://community.chocolatey.org/packages/make) through [chocolatey](https://chocolatey.org/install) package manager
+* MSYS with `mingw-w64-x86_64-gcc` and `mingw-w64-x86_64-make` (add
+  `msys64/mingw64/bin` to
+  path). [Tutorial](https://www.youtube.com/watch?v=aXF4A5UeSeM)
+* You may need to start Julia from the Git Bash console.
+
+##### Software needed for build and installation (Linux)
+* Git
+* Julia 1.5.4 (currently,
+  [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
+  with Julia 1.6)
+* build-essential (or the equivalent in your Linux distribution)
+* CMAKE
+
+### Building instructions
 
 Download and build the Julia package like this:
 
@@ -35,7 +58,7 @@ The QuEST dynamic libary is loaded when you create your (first) QuEST
 environment.  In order to switch to another precision, you have to
 terminate Julia, and start it again.
 
-#### Expert QuEST users
+### Expert QuEST users
 
 **This hasn't been tested!**
 
