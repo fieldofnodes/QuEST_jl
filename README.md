@@ -30,6 +30,8 @@ scientific computing language [Julia](https://julialang.org/).
 * build-essential (or the equivalent in your Linux distribution)
 * CMAKE
 
+### Building instructions
+
 Download and build the Julia package like this:
 
 ```{julia}
