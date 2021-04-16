@@ -323,7 +323,7 @@ function test_controlledCompactUnitary()
         norm = sqrt(α*conj(α) + β*conj(β))
         α /= norm
         β /= norm
-        numQubits = rand(1:12)
+        numQubits = rand(2:12)
         target = rand(1:numQubits)
         control = rand(1:numQubits)
         while target == control
@@ -3522,6 +3522,10 @@ end
 end
 
 @testset "test_PauliHaiml" begin
+    test_compactUnitary()
+end
+
+@testset "test_compactUnitary" begin
     test_compactUnitary()
 end
 

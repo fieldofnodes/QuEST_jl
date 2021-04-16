@@ -43,7 +43,7 @@ function controlledMultiQubitUnitary(qureg   ::QuEST_Types.Qureg,
                  1:length(targs) )
     @assert ctrl ∉ targs
 
-    @assert u.numQubits == qureg.numQubitsRepresented
+    @assert u.numQubits < qureg.numQubitsRepresented
 
     ccall(:controlledMultiQubitUnitary, Cvoid,
           (QuEST_Types.Qureg, Cint, Ptr{Cint}, Cint,          QuEST_Types.ComplexMatrixN),
