@@ -108,7 +108,7 @@ As in the non-expert version, once you create a QuEST environment with
 a precision, the library is loaded, and Julia is bound to that
 precision, until you stop Julia.
 
-Note on Apple silicon (e.g., MadcBook Air M1): If you use Julia in x86-mode, you also have to build the QuEST library in x86-mode.  If you build it for ARM, Julia cannot load it across architectures.
+Note on Apple silicon (e.g., MacBook Air M1): If you use Julia in x86-mode (as it currently comes on Homebrew), you also have to build the QuEST library in x86-mode.  If you build it for ARM, Julia cannot load it across architectures.
 
 ## Documentation
 
