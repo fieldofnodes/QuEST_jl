@@ -7,12 +7,12 @@ scientific computing language [Julia](https://julialang.org/).
 
 ## Installation
 
-There are two ways to build `Quest_jl`, depending on the person building it.
+There are two ways to build Quest_jl, depending on the person building it.
 
 **Expert build** is intended for people who want to tune their QuEST installation to their hardware.
-An expert must download and build QuEST himself, and make it compatible with the `QuEST_jl` expert-build process, see below.
+An expert must download and build QuEST himself, and make it compatible with the QuEST_jl expert-build process, see below.
 
-**Non-expert build** is intended for people who are happy with the default QuEST build, but want to `QuEST_jl` to work out of the box.
+**Non-expert build** is intended for people who are happy with the default QuEST build, but want to QuEST_jl to work out of the box.
 
 ### Building QuEST_jl as non-expert
 
