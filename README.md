@@ -1,3 +1,14 @@
+# DEV-BRANCH NOTES
+
+**Remove all of these before merging into master!**
+
+#### To use Julia 1.6...
+1. Git-clone QuEST_jl
+2. `] activate` it
+3. `(QuEST_jl) pkg> rm Clang`
+4. `(QuEST_jl) pkg> add "https://github.com/JuliaInterop/Clang.jl#master"`
+5. Build manually
+
 # QuEST_jl
 #### Julia wrapper for the Quantum Exact Simulation Toolkit (QuEST)
 
