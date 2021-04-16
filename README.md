@@ -144,8 +144,9 @@ You can contribute by:
 
 #### Code policy
 
-* Type everything you can!
+* Type ⃰ all you can!
 
+ ⃰) Restrict the data type of.
 
 ## Version History
 
