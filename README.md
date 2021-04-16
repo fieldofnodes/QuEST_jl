@@ -10,7 +10,7 @@ scientific computing language [Julia](https://julialang.org/).
 
 ### Non-expert QuEST users
 
-### Software needed for build and installation (Windows 10)
+##### Software needed for build and installation (Windows 10)
 * Git
 * Julia 1.5.4 (currently,
   [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
@@ -22,7 +22,7 @@ scientific computing language [Julia](https://julialang.org/).
   path). [Tutorial](https://www.youtube.com/watch?v=aXF4A5UeSeM)
 * You may need to start Julia from the Git Bash console.
 
-### Software needed for build and installation (Linux)
+##### Software needed for build and installation (Linux)
 * Git
 * Julia 1.5.4 (currently,
   [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
@@ -56,7 +56,7 @@ The QuEST dynamic libary is loaded when you create your (first) QuEST
 environment.  In order to switch to another precision, you have to
 terminate Julia, and start it again.
 
-## Expert QuEST users
+### Expert QuEST users
 
 **This hasn't been tested!**
 
