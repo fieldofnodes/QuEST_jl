@@ -31,7 +31,24 @@ The non-expert build clones a copy of QuEST from our fork, [TartuQC/QuEST](https
 
 You do, however, need to have the necessary software on your system.
 
+##### Software requirements on Linux
+* Git
+* Julia 1.5.4 (currently,
+  [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
+  with Julia 1.6)
+* build-essential (or the equivalent in your Linux distribution)
+* CMAKE
+
+##### Software requirements on MacOS
+* xcode
+* Julia 1.6 (from homebrew) with the hack above to get around the Clang.jl problem.
+
+Note on Apple silicon (e.g., MadcBook Air M1): It doesn't work currently.  Julia comes for x86 out of Homebrew, but the QuEST library is built by xcode for ARM, so Julia cannot load it.
+
 ##### Software requirements on Windows 10
+
+*We cannot make the Windows build work right now, as we don't know how to make make make a `.dll` file; see [issue # 10](https://github.com/TartuQC/QuEST_jl/issues/10).
+
 * Git
 * Julia 1.5.4 (currently,
   [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
@@ -43,13 +60,6 @@ You do, however, need to have the necessary software on your system.
   path). [Tutorial](https://www.youtube.com/watch?v=aXF4A5UeSeM)
 * You may need to start Julia from the Git Bash console.
 
-##### Software requirements on Linux
-* Git
-* Julia 1.5.4 (currently,
-  [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
-  with Julia 1.6)
-* build-essential (or the equivalent in your Linux distribution)
-* CMAKE
 
 ### Building instructions
 
