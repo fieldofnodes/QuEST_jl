@@ -11,7 +11,7 @@ Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl w
 
 ##### To use Julia 1.6...
 *Before* you `] add` QuEST_jl:
-1. `(@v1.6) pkg> add "https://github.com/TartuQC/Clang.jl"`
+1. `(@v1.6) pkg> add "https://github.com/JuliaInterop/Clang.jl"`
 2. `(@v1.6) pkg> add "https://github.com/TartuQC/QuEST_jl.git"`
 
 ## Installation
