@@ -58,13 +58,14 @@ function reportStateToScreen(qureg      ::QuEST_Types.Qureg,
     nothing
 end
 
-function seedQuEST(seedarray ::Base.Vector{Clong}) ::Nothing
+function seedQuEST(seedarray ::Base.Vector{Culong}) ::Nothing
 
     @assert  ! isempty(seedarray)
 
-    ccall(:seedQuESTDefault, Cvoid,
-          (Ptr{Clong}, Cint),
-          seedarray,          length(seedarray))
+    ccall(:seedQuEST,
+          Cvoid, (Ptr{Culong}, Cint),
+          seedarray,
+          Cint(length(seedarray)))
     return nothing
 end
 

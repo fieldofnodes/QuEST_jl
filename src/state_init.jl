@@ -1,12 +1,10 @@
 # QuEST_jl/src/base/state_init.jl
 #
 
-function cloneQureg(targetQureg ::QuEST_Types.Qureg,
-                    copyQureg   ::QuEST_Types.Qureg) ::Nothing
+function cloneQureg(targetQureg ::QuEST_Types.Qureg, copyQureg ::QuEST_Types.Qureg) ::Nothing
 
-    return ccall(:createCloneQureg, Cvoid,
-                 (QuEST_Types.Qureg, QuEST_Types.Qureg),
-                 targetQureg,        copyQureg)
+    return ccall(:cloneQureg, Cvoid, (QuEST_Types.Qureg, QuEST_Types.Qureg), targetQureg, copyQureg)
+
 end
 
 function initBlankState(qureg ::QuEST_Types.Qureg) ::Nothing
@@ -35,7 +33,7 @@ function initPureState(qureg ::QuEST_Types.Qureg,
                        pure  ::QuEST_Types.Qureg) ::Nothing
 
     @assert qureg.numQubitsRepresented == pure.numQubitsRepresented
-    @assert ! pure.isDensityMatrix
+    @assert pure.isDensityMatrix == 0
 
     ccall(:initPureState, Cvoid,
           (QuEST_Types.Qureg,  QuEST_Types.Qureg),
@@ -65,9 +63,10 @@ end
 function setAmps(qureg        ::QuEST_Types.Qureg,
                  startIdx     ::Integer,
                  amps_real    ::Vector{Qreal},
-                 amps_imag    ::Vector{Qreal})   :: Nothing
+                 amps_imag    ::Vector{Qreal},
+                 numAmps      ::Clonglong)   :: Nothing
 
-    local   numAmps ::Clonglong =  length(amps_real)
+    @assert numAmps             == length(amps_real)
     @assert numAmps             == length(amps_imag)
     @assert startIdx + numAmps  <= qureg.numAmpsTotal
 
@@ -75,6 +74,11 @@ function setAmps(qureg        ::QuEST_Types.Qureg,
           (QuEST_Types.Qureg, Clonglong, Ptr{Qreal}, Ptr{Qreal}, Clonglong),
           qureg,              startIdx,  amps_real,  amps_imag,  numAmps)
 end
+
+
+
+const __ℂ     = QuEST_Types.Complex
+const __Qureg = QuEST_Types.Qureg
 
 function setWeightedQureg(factor1    ::Complex{Qreal},
                           qureg1     ::QuEST_Types.Qureg,
@@ -86,14 +90,11 @@ function setWeightedQureg(factor1    ::Complex{Qreal},
     @assert Bool(qureg1.isDensityMatrix) == Bool(qureg2.isDensityMatrix) == Bool(quregOut.isDensityMatrix)
     @assert qureg1.numQubitsRepresented  == qureg2.numQubitsRepresented  == quregOut.numQubitsRepresented
 
-    local ℂ     = QuEST_Types.Complex
-    local Qureg = QuEST_Types.Qureg
-
-    local factor1_quest   = ℂ(real(factor1  ),imag(factor1  ))
-    local factor2_quest   = ℂ(real(factor2  ),imag(factor2  ))
-    local factorOut_quest = ℂ(real(factorOut),imag(factorOut))
+    local factor1_quest   = __ℂ(real(factor1  ),imag(factor1  ))
+    local factor2_quest   = __ℂ(real(factor2  ),imag(factor2  ))
+    local factorOut_quest = __ℂ(real(factorOut),imag(factorOut))
 
     ccall(:setWeightedQureg, Cvoid,
-          (ℂ,            Qureg,   ℂ,             Qureg,  ℂ,               Qureg),
-          factor1_quest, qureg1,  factor2_quest, qureg2, factorOut_quest, quregOut)
+          (__ℂ,          __Qureg,  __ℂ,           __Qureg, __ℂ,             __Qureg),
+          factor1_quest, qureg1,   factor2_quest, qureg2,  factorOut_quest, quregOut)
 end

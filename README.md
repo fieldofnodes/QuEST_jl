@@ -5,9 +5,59 @@ This package makes available the high-performance quantum circuit
 simulator as a package in the the Matlab-like rapid-prototyping
 scientific computing language [Julia](https://julialang.org/).
 
+### Note on Julia 1.6
+
+Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl with Julia 1.6, you have to jump through some hoops:
+
+##### To use Julia 1.6...
+*Before* you `] add` QuEST_jl:
+1. `(@v1.6) pkg> add "https://github.com/JuliaInterop/Clang.jl"`
+2. `(@v1.6) pkg> add "https://github.com/TartuQC/QuEST_jl.git"`
+
 ## Installation
 
-#### Non-expert QuEST users
+There are two ways to build Quest_jl, depending on whether you want to tune QuEST to your hardware or are happy with the QuEST default make process.
+
+**Expert build** is intended for people who want to tune their QuEST installation to their hardware.
+An expert must download and build QuEST himself, and make it compatible with the QuEST_jl expert-build process, see below.
+
+**Non-expert build** is intended for people who are happy with the default QuEST build, but want to QuEST_jl to work out of the box.
+
+### Building QuEST_jl as non-expert
+
+The non-expert build clones a copy of QuEST from our fork, [TartuQC/QuEST](https://github.com/TartuQC/QuEST), which it then automatically compiles using make and C-compiler and whatnot -- you don't want to know.
+
+You do, however, need to have the necessary software on your system.
+
+##### Software requirements on Linux
+* Git
+* Julia 1.5.4 (currently,
+  [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
+  with Julia 1.6)
+* build-essential (or the equivalent in your Linux distribution)
+* CMAKE
+
+##### Software requirements on MacOS
+* xcode
+* Julia 1.6 (from homebrew) with the hack above to get around the Clang.jl problem.
+
+##### Software requirements on Windows 10
+
+*We cannot make the Windows build work right now, as we don't know how to make make make a `.dll` file; see [issue # 10](https://github.com/TartuQC/QuEST_jl/issues/10).
+
+* Git
+* Julia 1.5.4 (currently,
+  [Clang.jl](https://github.com/JuliaInterop/Clang.jl) does not work
+  with Julia 1.6)
+* [CMAKE](https://cmake.org/download/) (added to path)
+* [make](https://community.chocolatey.org/packages/make) through [chocolatey](https://chocolatey.org/install) package manager
+* MSYS with `mingw-w64-x86_64-gcc` and `mingw-w64-x86_64-make` (add
+  `msys64/mingw64/bin` to
+  path). [Tutorial](https://www.youtube.com/watch?v=aXF4A5UeSeM)
+* You may need to start Julia from the Git Bash console.
+
+
+#### Building instructions
 
 Download and build the Julia package like this:
 
@@ -20,7 +70,7 @@ https://github.com/Ketita/QuEST) to your Julia packages folder, and
 built in two versions, one for 32-bit precision and one for 64-bit
 precision.
 
-After that, just it!  Whenever you use it, you have to decide which
+After that, just use it!  Whenever you use it, you have to decide which
 "QuEST precision" you want: wither `Qreal` is 32-bit (Float32) or
 64-bit (Float64).  The two variants are in different sub-modules of
 QuEST_jl.  For example, to use 32-bit precision, just do this:
@@ -35,20 +85,17 @@ The QuEST dynamic libary is loaded when you create your (first) QuEST
 environment.  In order to switch to another precision, you have to
 terminate Julia, and start it again.
 
-#### Expert QuEST users
-
-**This hasn't been tested!**
+### Building QuEST_jl as "expert"
 
 To activate "expert" mode, before building the QuEST_jl package, you have to set the environment variable
 ```{bash}
-export QUEST_JL_EXPERT_BUILD=1
+ QUEST_JL_EXPERT_BUILD=1
 ```
 
 The value doesn't matter, the build process checks only *whether* the
 environment variable is set or not.
 
-If it is set, QuEST will *not* be cloned from GitHub.  Instead you are
-expected to make it available in your own, expertly tuned version.
+If it is set, QuEST will be cloned from GitHub, but not built.  Only the `.h`-files will be taken to auto-generate the C-inferface.  You need to have your own compiled version of QuEST available, and you have to make Julia find it.
 
 You need to make available for automatic loading two dynamically loaded libraries, with the names
 
@@ -59,6 +106,8 @@ As in the non-expert version, once you create a QuEST environment with
 a precision, the library is loaded, and Julia is bound to that
 precision, until you stop Julia.
 
+Note on Apple silicon (e.g., MacBook Air M1): If you use Julia in x86-mode (as it currently comes on Homebrew), you also have to build the QuEST library in x86-mode.  If you build it for ARM, Julia cannot load it across architectures.
+
 ## Documentation
 
 In Julia:
@@ -68,16 +117,31 @@ In Julia:
 We refer to QuEST for the documentation of all functions and types.
 
 
-### Difference from documented QuEST behavior
+#### Difference from documented QuEST behavior
 
 * `measureWithStats()`: instead of taking a reference to the probability, the Julia function
   returns a tuple (outcome,probability)
 
-### Julia-extensions to the QuEST interface
+#### Julia-extensions to the QuEST interface
 
 * Type `QuEST𝑥𝑦.QubitIdx` (exported): The element-type for arrays of qubits (a C-integer type)
 
+## Contributing
 
+You can contribute by:
+* Using QuEST_jl and reporting bugs by creating issues
+* Looking at & resolving some of the issues (this requires familiarity with QuEST)
+
+#### Contribution policies
+
+1. By creating a pull request, you agree to irrevocably license your contribution under the MIT license to the whole universe.
+2. To contribute, fork the repository, then create a pull request. In the pull request, note the issue that you're addressing.
+
+#### Code policy
+
+* Type ⃰ all you can!
+
+ ⃰) Restrict the data type of.
 
 ## Version History
 
