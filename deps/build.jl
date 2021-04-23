@@ -46,7 +46,8 @@ const EXPERT_BUILD = haskey(ENV, "QUEST_JL_EXPERT_BUILD")
 
 
 
-using Clang.Generators
+using Clang
+using Clang.LibClang.Clang_jll
 
 """
 Function `_bits_string()`
@@ -71,19 +72,17 @@ function _clang_from_h(makePrecision ::Int ; quest_root::String, isWindows ::Boo
 
     questclang_include = joinpath(quest_root,"QuEST","include") |> normpath
     questclang_headers = [ joinpath(questclang_include,header)   for header in ["QuEST.h","QuEST_precision.h"] ] # ?readdir(questclang_include) if endswith(header, ".h")]
-
-    options = Dict(
-        "general"=>Dict(
-            "library_name"=>"questclang",
-            "output_file_path"=>joinpath(@__DIR__, "questclang_"*precision*".jl"),
-        )
-    )
-
-    args = ["-I"*joinpath(questclang_include, ".."), "-DQuEST_PREC=$(makePrecision)"]
-
-    ctx = create_context(questclang_headers, args, options)
-
-    build!(ctx)
+    wc = init(;
+              headers           = questclang_headers,
+              output_file       = joinpath(@__DIR__, "questclang_api_"*precision*".jl"),
+              common_file       = joinpath(@__DIR__, "questclang_common_"*precision*".jl"),
+              clang_includes    = vcat(questclang_include, CLANG_INCLUDE),
+              clang_args        = ["-I", joinpath(questclang_include, ".."), "-DQuEST_PREC=$(makePrecision)"],
+              header_wrapped    = (root, current)->root == current,
+              header_library    = x->"questclang",
+              clang_diagnostics = true,
+              )
+    run(wc)
 end
 
 
