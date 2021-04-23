@@ -5,14 +5,18 @@ This package makes available the high-performance quantum circuit
 simulator as a package in the the Matlab-like rapid-prototyping
 scientific computing language [Julia](https://julialang.org/).
 
-### Note on Julia 1.6
+### Note on Clang.jl
 
-Clang.jl currently doesn't work with Julia 1.6, so if you want to use QuEST_jl with Julia 1.6, you have to jump through some hoops:
+We are currently using Clang.jl to automatically create the Julia code matching the C data structures. The current version 0.12.1 of the *real* [Clang.jl](https://github.com/JuliaInterop/Clang.jl) doesn't work with the current Julia 1.6 and appears to be in a longer process of changing stuff. For that reason, we made a copy of Clang.jl here: [github.com/TartuQC/Clang.jl](https://github.com/TartuQC/Clang.jl) which differs from the original only in the UUID and in requiring the current Julia 1.6.
 
-##### To use Julia 1.6...
-*Before* you `] add` QuEST_jl:
-1. `(@v1.6) pkg> add "https://github.com/JuliaInterop/Clang.jl"`
-2. `(@v1.6) pkg> add "https://github.com/TartuQC/QuEST_jl.git"`
+Because of that, some shit is necessary to make stuff work.  Contributors are welcome to
+1. Make Clang.jl work (with Julia 1.6), *or*
+2. Move QuEST_jl from Clang.jl to BinaryBuilder.
+
+##### Here's what you have to do:
+*Don't* do `pkg> add` QuEST_jl. Instead do the following two steps in this order:
+1. `(@v1.6) pkg> add https://github.com/TartuQC/Clang.jl`
+2. `(@v1.6) pkg> add https://github.com/TartuQC/QuEST_jl.git`
 
 ## Installation
 
