@@ -5,17 +5,14 @@ version = "0.1.0"
 
 [deps]
 CEnum = "fa961155-64e5-5f13-b03f-caf6b980ea82"
-Clang = "40e3b903-d033-50b4-a0cc-940c62c95e31"
+Clang = "cf6e1f2a-8e4b-4cd1-b89c-30ca782ed4ca"
 Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
-Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-RandomMatrices = "2576dda1-a324-5b11-aa66-c48ed7e3c618"
-
-[compat]
-Clang = "0.12.2, 0.13.0"
 
 [extras]
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+RandomMatrices = "2576dda1-a324-5b11-aa66-c48ed7e3c618"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test"]
+test = ["Test", "RandomMatrices", "Printf"]
