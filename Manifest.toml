@@ -1,0 +1,9 @@
+# This file is machine-generated - editing it directly is not advised
+
+[[Clang]]
+deps = ["CEnum", "Clang_jll", "DataStructures", "Libdl"]
+git-tree-sha1 = "4400629b93a97b843bef5a049f2346449aa4e02d"
+repo-rev = "main"
+repo-url = "https://github.com/TartuQC/Clang.jl.git"
+uuid = "cf6e1f2a-8e4b-4cd1-b89c-30ca782ed4ca"
+version = "0.12.1"
