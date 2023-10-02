@@ -37,7 +37,7 @@ using Test
 using RandomMatrices
 using LinearAlgebra
 using Printf
-
+tolerance = 1e-10
 # function test_env_and_qureg()
 
 #     function test_2quregs(q ::QuEST.Qureg, env ::QuEST.QuESTEnv)
@@ -150,8 +150,8 @@ function check_ComplexMatrixN()
             real_row = unsafe_wrap(Vector{qreal}, real_ptrs[r], 2^i)
             imag_row = unsafe_wrap(Vector{qreal}, imag_ptrs[r], 2^i)
             for c=1:2^i
-                @test M_j_real[(r-1)*2^i + c] ≈ real_row[c]
-                @test M_j_imag[(r-1)*2^i + c] ≈ imag_row[c]
+                @test M_j_real[(r-1)*2^i + c] ≈ real_row[c] atol = tolerance
+                @test M_j_imag[(r-1)*2^i + c] ≈ imag_row[c] atol = tolerance
             end
         end
         QuEST.destroyComplexMatrixN(M)
@@ -166,8 +166,8 @@ function check_ComplexMatrixN()
             real_row = unsafe_wrap(Vector{qreal}, real_ptrs[r], 2^i)
             imag_row = unsafe_wrap(Vector{qreal}, imag_ptrs[r], 2^i)
             for c=1:2^i
-                @test real(M_j[r, c]) ≈ real_row[c]
-                @test imag(M_j[r, c]) ≈ imag_row[c]
+                @test real(M_j[r, c]) ≈ real_row[c] atol = tolerance
+                @test imag(M_j[r, c]) ≈ imag_row[c] atol = tolerance
             end
         end
         QuEST.destroyComplexMatrixN(M)
@@ -183,8 +183,8 @@ function check_ComplexMatrixN()
             real_row = unsafe_wrap(Vector{qreal}, real_ptrs[r], 2^i)
             imag_row = unsafe_wrap(Vector{qreal}, imag_ptrs[r], 2^i)
             for c=1:2^i
-                @test real(m_func(r, c)) ≈ real_row[c]
-                @test imag(m_func(r, c)) ≈ imag_row[c]
+                @test real(m_func(r, c)) ≈ real_row[c] atol = tolerance
+                @test imag(m_func(r, c)) ≈ imag_row[c] atol = tolerance
             end
         end
         QuEST.destroyComplexMatrixN(M)
@@ -202,8 +202,8 @@ function test_DiagonalOp()
         reals = unsafe_wrap(Vector{qreal}, op.real, 2^num_qubits)
         imags = unsafe_wrap(Vector{qreal}, op.imag, 2^num_qubits)
         for e = 1:2^num_qubits
-            @test reals[e] ≈ real(op_j[e])
-            @test imags[e] ≈ imag(op_j[e])
+            @test reals[e] ≈ real(op_j[e]) atol = tolerance
+            @test imags[e] ≈ imag(op_j[e]) atol = tolerance
         end
 
         
@@ -216,8 +216,8 @@ function test_DiagonalOp()
         test_im = imag(op_j)
         QuEST.setDiagonalOpElems(op, start_ind-1, test_re, test_im, len_arr)
         for ind = start_ind:start_ind+len_arr-1
-            @test reals[ind] ≈ test_re[ind-start_ind+1]
-            @test imags[ind] ≈ test_im[ind-start_ind+1]
+            @test reals[ind] ≈ test_re[ind-start_ind+1] atol = tolerance
+            @test imags[ind] ≈ test_im[ind-start_ind+1] atol = tolerance
         end
         QuEST.syncDiagonalOp(op)
         QuEST.destroyDiagonalOp(op, env)
@@ -246,7 +246,7 @@ function test_PauliHaiml()
         hamil_codes = unsafe_wrap(Vector{QuEST.QuEST_Types.pauliOpType}, hamil.pauliCodes, numQubits*numSumTerms)
         hamil_coeffs = unsafe_wrap(Vector{qreal}, hamil.termCoeffs, numSumTerms)
         for ind =1:numSumTerms
-            @test coeffs[ind] ≈ hamil_coeffs[ind] 
+            @test coeffs[ind] ≈ hamil_coeffs[ind]  atol = tolerance
             for qubit = 1:numQubits
                 @test codes[(ind-1)*numQubits+qubit] == hamil_codes[(ind-1)*numQubits+qubit]
             end
@@ -277,7 +277,7 @@ function test_PauliHaiml()
         hamil_codes = unsafe_wrap(Vector{QuEST.QuEST_Types.pauliOpType}, hamil.pauliCodes, numQubits*numSumTerms)
         hamil_coeffs = unsafe_wrap(Vector{qreal}, hamil.termCoeffs, numSumTerms)
         for ind=1:numSumTerms
-            @test coeffs[ind] ≈ hamil_coeffs[ind]
+            @test coeffs[ind] ≈ hamil_coeffs[ind] atol = tolerance
             for qubit = 1:numQubits
                 @test codes[(ind-1)*numQubits+qubit] == hamil_codes[(ind-1)*numQubits+qubit]
             end
@@ -306,10 +306,10 @@ function test_compactUnitary()
         QuEST.compactUnitary(qureg, target-1, α, β)
         reals = unsafe_wrap(Vector{qreal}, qureg.stateVec.real, 2^numQubits)
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
-        @test reals[1] ≈ real(α)
-        @test imags[1] ≈ imag(α)
-        @test reals[2^(target-1)+1] ≈ real(β)
-        @test imags[2^(target-1)+1] ≈ imag(β)
+        @test reals[1] ≈ real(α) atol = tolerance
+        @test imags[1] ≈ imag(α) atol = tolerance
+        @test reals[2^(target-1)+1] ≈ real(β) atol = tolerance
+        @test imags[2^(target-1)+1] ≈ imag(β) atol = tolerance
         QuEST.destroyQureg(qureg, env)
     end
     QuEST.destroyQuESTEnv(env)
@@ -336,10 +336,10 @@ function test_controlledCompactUnitary()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
         #print(reals)
         #print(imags)
-        @test reals[2^(control-1)+1] ≈ real(α)
-        @test imags[2^(control-1)+1] ≈ imag(α)
-        @test reals[2^(control-1)+2^(target-1)+1] ≈ real(β)
-        @test imags[2^(control-1)+2^(target-1)+1] ≈ imag(β)
+        @test reals[2^(control-1)+1] ≈ real(α) atol = tolerance
+        @test imags[2^(control-1)+1] ≈ imag(α) atol = tolerance
+        @test reals[2^(control-1)+2^(target-1)+1] ≈ real(β) atol = tolerance
+        @test imags[2^(control-1)+2^(target-1)+1] ≈ imag(β) atol = tolerance
         QuEST.destroyQureg(qureg, env)
     end
     QuEST.destroyQuESTEnv(env)
@@ -381,8 +381,8 @@ function test_controlledMultiQubitUnitary()
         #print(reals)
         #print(imags)
         for ind = 1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyComplexMatrixN(M)
         QuEST.destroyQureg(qureg, env)
@@ -412,11 +412,11 @@ function test_controlledNot()
         one_ind=2^(control-1)+2^(target-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ 1
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 1 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -445,11 +445,11 @@ function test_controlledPauliY()
         one_ind=2^(control-1)+2^(target-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 1
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 1 atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -479,11 +479,11 @@ function test_controlledPhaseFlip()
         one_ind=2^(control-1)+2^(target-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ -1
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ -1 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -513,11 +513,11 @@ function test_controlledPhaseShift()
         one_ind=2^(control-1)+2^(target-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(ℯ^(im*θ))
-                @test imags[ind] ≈ imag(ℯ^(im*θ))
+                @test reals[ind] ≈ real(ℯ^(im*θ)) atol = tolerance
+                @test imags[ind] ≈ imag(ℯ^(im*θ)) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -557,14 +557,14 @@ function test_controlledRotateAroundAxis()
         zero_ind=2^(control-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -601,14 +601,14 @@ function test_controlledRotateX()
         zero_ind=2^(control-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -645,14 +645,14 @@ function test_controlledRotateY()
         zero_ind=2^(control-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -689,14 +689,14 @@ function test_controlledRotateZ()
         zero_ind=2^(control-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -732,8 +732,8 @@ function test_controlledTwoQubitUnitary()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
         
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -770,14 +770,14 @@ function test_controlledUnitary()
         zero_ind=2^(control-1)+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -811,8 +811,8 @@ function test_hadamard()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -865,8 +865,8 @@ function test_multiControlledMultiQubitUnitary()
         #print(imags)
         #print(v)
         for ind = 1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyComplexMatrixN(M)
         QuEST.destroyQureg(qureg, env)
@@ -898,11 +898,11 @@ function test_multiControlledPhaseFlip()
         one_ind=2^(num_ctrls)
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ -1
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ -1 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -932,11 +932,11 @@ function test_multiControlledPhaseShift()
         one_ind=2^(num_ctrls)
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(ℯ^(im*θ))
-                @test imags[ind] ≈ imag(ℯ^(im*θ))
+                @test reals[ind] ≈ real(ℯ^(im*θ)) atol = tolerance
+                @test imags[ind] ≈ imag(ℯ^(im*θ)) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -984,8 +984,8 @@ function test_multiControlledTwoQubitUnitary()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
         
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1035,8 +1035,8 @@ function test_multiControlledUnitary()
         
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
 
 
@@ -1080,8 +1080,8 @@ function test_multiQubitUnitary()
         
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
 
 
@@ -1143,8 +1143,8 @@ function test_multiRotatePauli()
         
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
 
 
@@ -1201,8 +1201,8 @@ function test_multiRotateZ()
         
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
 
 
@@ -1277,8 +1277,8 @@ function test_multiStateControlledUnitary()
         
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
 
 
@@ -1313,8 +1313,8 @@ function test_pauliX()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1347,8 +1347,8 @@ function test_pauliY()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1381,8 +1381,8 @@ function test_pauliZ()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1408,11 +1408,11 @@ function test_phaseShift()
         one_ind=2^target+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(ℯ^(im*θ))
-                @test imags[ind] ≈ imag(ℯ^(im*θ))
+                @test reals[ind] ≈ real(ℯ^(im*θ)) atol = tolerance
+                @test imags[ind] ≈ imag(ℯ^(im*θ)) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -1447,14 +1447,14 @@ function test_rotateAroundAxis()
         zero_ind=1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -1490,14 +1490,14 @@ function test_rotateX()
         zero_ind=+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -1533,14 +1533,14 @@ function test_rotateY()
         zero_ind=+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -1576,14 +1576,14 @@ function test_rotateZ()
         zero_ind=+1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -1618,8 +1618,8 @@ function test_sGate()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1655,8 +1655,8 @@ function test_sqrtSwapGate()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1692,8 +1692,8 @@ function test_swapGate()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1727,8 +1727,8 @@ function test_tGate()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1767,8 +1767,8 @@ function test_twoQubitUnitary()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
         
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -1803,14 +1803,14 @@ function test_unitary()
         zero_ind=1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -1839,7 +1839,7 @@ function test_collapseToOutcome()
 
         p = QuEST.collapseToOutcome(qureg, target, 0)
 
-        @test p ≈ (1 + cos(θ))/2
+        @test p ≈ (1 + cos(θ))/2 atol = tolerance
 
         reals = unsafe_wrap(Vector{qreal}, qureg.stateVec.real, 2^numQubits)
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
@@ -1892,9 +1892,9 @@ function test_measureWithStats()
 
         @test cbit in [0, 1]
         if cbit == 0 
-            @test prob ≈ (1 + cos(θ))/2
+            @test prob ≈ (1 + cos(θ))/2 atol = tolerance
         else
-            @test prob ≈ (1 - cos(θ))/2
+            @test prob ≈ (1 - cos(θ))/2 atol = tolerance
         end
 
     end
@@ -1926,8 +1926,8 @@ function test_DiagonalOp()
         reals = unsafe_wrap(Vector{qreal}, qureg.stateVec.real, 2^num_qubits)
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^num_qubits)
     
-        @test real(op_j[basis]) ≈ reals[basis]
-        @test imag(op_j[basis]) ≈ imags[basis]
+        @test real(op_j[basis]) ≈ reals[basis] atol = tolerance
+        @test imag(op_j[basis]) ≈ imags[basis] atol = tolerance
 
         QuEST.destroyDiagonalOp(op, env)
     end
@@ -1958,14 +1958,14 @@ function test_applyMatrix2()
         zero_ind=1
         for ind =1:2^numQubits
             if ind == one_ind
-                @test reals[ind] ≈ real(v[2])
-                @test imags[ind] ≈ imag(v[2])
+                @test reals[ind] ≈ real(v[2]) atol = tolerance
+                @test imags[ind] ≈ imag(v[2]) atol = tolerance
             elseif ind == zero_ind
-                @test reals[ind] ≈ real(v[1])
-                @test imags[ind] ≈ imag(v[1])
+                @test reals[ind] ≈ real(v[1]) atol = tolerance
+                @test imags[ind] ≈ imag(v[1]) atol = tolerance
             else
-                @test reals[ind] ≈ 0
-                @test imags[ind] ≈ 0
+                @test reals[ind] ≈ 0 atol = tolerance
+                @test imags[ind] ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -2007,8 +2007,8 @@ function test_applyMatrix4()
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
         
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
     end
@@ -2050,8 +2050,8 @@ function test_applyMatrixN()
         
 
         for ind =1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
 
 
@@ -2106,8 +2106,8 @@ function test_applyMultiControlledMatrixN()
         #print(imags)
         #print(v)
         for ind = 1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
         QuEST.destroyComplexMatrixN(M)
         QuEST.destroyQureg(qureg, env)
@@ -2168,8 +2168,8 @@ function test_applyPauliHamil()
         imags = unsafe_wrap(Vector{qreal}, out_qureg.stateVec.imag, 2^numQubits)
 
         for ind = 1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
 
         QuEST.destroyQureg(in_qureg, env)
@@ -2230,8 +2230,8 @@ function test_applyPauliSum()
         imags = unsafe_wrap(Vector{qreal}, out_qureg.stateVec.imag, 2^numQubits)
 
         for ind = 1:2^numQubits
-            @test reals[ind] ≈ real(v[ind])
-            @test imags[ind] ≈ imag(v[ind])
+            @test reals[ind] ≈ real(v[ind]) atol = tolerance
+            @test imags[ind] ≈ imag(v[ind]) atol = tolerance
         end
 
         QuEST.destroyQureg(in_qureg, env)
@@ -2333,8 +2333,8 @@ function test_applyTrotterCircuit()
         # end
 
         for ind = 1:2^numQubits
-            @test reals[ind] ≈ reals2[ind]
-            @test imags[ind] ≈ imags2[ind]
+            @test reals[ind] ≈ reals2[ind] atol = tolerance
+            @test imags[ind] ≈ imags2[ind] atol = tolerance
         end
 
         QuEST.destroyQureg(qureg, env)
@@ -2381,7 +2381,7 @@ function test_calcDensityInnerProduct()
         QuEST.multiQubitUnitary(qureg1, targs, U1)
         QuEST.multiQubitUnitary(qureg2, targs, U2)
 
-        @test my_inner_prod ≈ QuEST.calcDensityInnerProduct(qureg1, qureg2)
+        @test my_inner_prod ≈ QuEST.calcDensityInnerProduct(qureg1, qureg2) atol = tolerance
 
         QuEST.destroyQureg(qureg1, env)
         QuEST.destroyQureg(qureg2, env)
@@ -2413,8 +2413,8 @@ function test_calcExpecDiagonalOp()
 
         lhs = sum([state[x]*conj(state[x])*op_j[x] for x =1:2^numQubits])
 
-        @test rhs.real ≈ real(lhs)
-        @test rhs.imag ≈ imag(lhs)
+        @test rhs.real ≈ real(lhs) atol = tolerance
+        @test rhs.imag ≈ imag(lhs) atol = tolerance
 
         QuEST.destroyDiagonalOp(op, env)
 
@@ -2474,7 +2474,7 @@ function test_calcExpecPauliHamil()
 
         rhs = QuEST.calcExpecPauliHamil(qureg, hamil, work)
 
-        @test rhs ≈ real(lhs)
+        @test rhs ≈ real(lhs) atol = tolerance
         
 
 
@@ -2534,7 +2534,7 @@ function test_calcExpecPauliProd()
 
         rhs = QuEST.calcExpecPauliProd(qureg, c_targs, codes, work)
 
-        @test rhs ≈ real(lhs)
+        @test rhs ≈ real(lhs) atol = tolerance
         
 
 
@@ -2669,7 +2669,7 @@ function test_calcHilbertSchmidtDistance()
         QuEST.multiQubitUnitary(qureg1, targs, U1)
         QuEST.multiQubitUnitary(qureg2, targs, U2)
 
-        @test real(my_inner_prod) ≈ QuEST.calcHilbertSchmidtDistance(qureg1, qureg2)
+        @test real(my_inner_prod) ≈ QuEST.calcHilbertSchmidtDistance(qureg1, qureg2) atol = tolerance
 
         QuEST.destroyQureg(qureg1, env)
         QuEST.destroyQureg(qureg2, env)
@@ -2712,7 +2712,7 @@ function test_calcInnerProduct()
         QuEST.multiQubitUnitary(qureg1, targs, U1)
         QuEST.multiQubitUnitary(qureg2, targs, U2)
 
-        @test my_inner_prod ≈ QuEST.calcInnerProduct(qureg1, qureg2)
+        @test my_inner_prod ≈ QuEST.calcInnerProduct(qureg1, qureg2) atol = tolerance
 
         QuEST.destroyQureg(qureg1, env)
         QuEST.destroyQureg(qureg2, env)
@@ -2746,8 +2746,8 @@ function test_calcProbOfOutcome()
         prob_zero = transpose(conj(state))*M_zero*state
         prob_one = transpose(conj(state))*M_one*state
 
-        @test real(prob_zero) ≈ QuEST.calcProbOfOutcome(qureg, target, 0)
-        @test real(prob_one) ≈ QuEST.calcProbOfOutcome(qureg, target, 1)
+        @test real(prob_zero) ≈ QuEST.calcProbOfOutcome(qureg, target, 0) atol = tolerance
+        @test real(prob_one) ≈ QuEST.calcProbOfOutcome(qureg, target, 1) atol = tolerance
 
         QuEST.destroyQureg(qureg, env)
 
@@ -2773,7 +2773,7 @@ function test_calcPurity()
         
         QuEST.multiQubitUnitary(qureg1, targs, U1)
 
-        @test 1 ≈ QuEST.calcPurity(qureg1)
+        @test 1 ≈ QuEST.calcPurity(qureg1) atol = tolerance
 
         QuEST.destroyQureg(qureg1, env)
 
@@ -2799,7 +2799,7 @@ function test_calcTotalProb()
         
         QuEST.multiQubitUnitary(qureg1, targs, U1)
 
-        @test 1 ≈ QuEST.calcTotalProb(qureg1)
+        @test 1 ≈ QuEST.calcTotalProb(qureg1) atol = tolerance
 
         QuEST.destroyQureg(qureg1, env)
 
@@ -2820,10 +2820,10 @@ function test_amp_funcs()
         QuEST.initStateFromAmps(qureg, real.(state), imag.(state))
         
         for ind =0:2^numQubits-1
-            @test QuEST.getAmp(qureg, ind) ≈ state[ind+1]
-            @test QuEST.getImagAmp(qureg, ind) ≈ imag(state[ind+1])
-            @test QuEST.getRealAmp(qureg, ind) ≈ real(state[ind+1])
-            @test QuEST.getProbAmp(qureg, ind) ≈ abs(state[ind+1])^2
+            @test QuEST.getAmp(qureg, ind) ≈ state[ind+1] atol = tolerance
+            @test QuEST.getImagAmp(qureg, ind) ≈ imag(state[ind+1]) atol = tolerance
+            @test QuEST.getRealAmp(qureg, ind) ≈ real(state[ind+1]) atol = tolerance
+            @test QuEST.getProbAmp(qureg, ind) ≈ abs(state[ind+1])^2 atol = tolerance
             @test QuEST.getNumQubits(qureg) == numQubits
             @test QuEST.getNumAmps(qureg) == 2^numQubits
         end
@@ -2858,7 +2858,7 @@ function test_getDensityAmp()
 
         for i=0:2^numQubits-1
             for j=0:2^numQubits-1
-                @test QuEST.getDensityAmp(qureg1, i, j) ≈ state1[i+1]*conj(state1[j+1])
+                @test QuEST.getDensityAmp(qureg1, i, j) ≈ state1[i+1]*conj(state1[j+1]) atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg1, env)
@@ -2883,7 +2883,7 @@ function test_cloneQureg()
         
         
         for ind =0:2^numQubits-1
-            @test QuEST.getAmp(qureg1, ind) ≈ QuEST.getAmp(qureg2, ind)
+            @test QuEST.getAmp(qureg1, ind) ≈ QuEST.getAmp(qureg2, ind) atol = tolerance
         end
         QuEST.destroyQureg(qureg1, env)
         QuEST.destroyQureg(qureg2, env)
@@ -2903,7 +2903,7 @@ function test_initBlankState()
         
         
         for ind =0:2^numQubits-1
-            @test QuEST.getAmp(qureg, ind) ≈ 0
+            @test QuEST.getAmp(qureg, ind) ≈ 0 atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
 
@@ -2924,9 +2924,9 @@ function test_initClassicalState()
         
         for ind =0:2^numQubits-1
             if ind == state
-                @test QuEST.getAmp(qureg, ind) ≈ 1
+                @test QuEST.getAmp(qureg, ind) ≈ 1 atol = tolerance
             else
-                @test QuEST.getAmp(qureg, ind) ≈ 0
+                @test QuEST.getAmp(qureg, ind) ≈ 0 atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg, env)
@@ -2946,7 +2946,7 @@ function test_initPlusState()
         
         
         for ind =0:2^numQubits-1
-            @test QuEST.getAmp(qureg, ind) ≈ 1/sqrt(2^numQubits)
+            @test QuEST.getAmp(qureg, ind) ≈ 1/sqrt(2^numQubits) atol = tolerance
         end
         QuEST.destroyQureg(qureg, env)
 
@@ -2971,7 +2971,7 @@ function test_initPureState()
         
         
         for ind =0:2^numQubits-1
-            @test QuEST.getAmp(qureg1, ind) ≈ QuEST.getAmp(qureg2, ind)
+            @test QuEST.getAmp(qureg1, ind) ≈ QuEST.getAmp(qureg2, ind) atol = tolerance
         end
         QuEST.destroyQureg(qureg1, env)
         QuEST.destroyQureg(qureg2, env)
@@ -2993,7 +2993,7 @@ function test_initStateFromAmps()
         QuEST.initStateFromAmps(qureg1, real.(state), imag.(state))
         
         for ind =0:2^numQubits-1
-            @test QuEST.getAmp(qureg1, ind) ≈ state[ind+1]
+            @test QuEST.getAmp(qureg1, ind) ≈ state[ind+1] atol = tolerance
         end
         QuEST.destroyQureg(qureg1, env)
 
@@ -3012,10 +3012,10 @@ function test_initZeroState()
 
         QuEST.initZeroState(qureg1)
         
-        @test QuEST.getAmp(qureg1, 0) ≈ 1
+        @test QuEST.getAmp(qureg1, 0) ≈ 1 atol = tolerance
 
         for ind =1:2^numQubits-1
-            @test QuEST.getAmp(qureg1, ind) ≈ 0
+            @test QuEST.getAmp(qureg1, ind) ≈ 0 atol = tolerance
         end
         QuEST.destroyQureg(qureg1, env)
 
@@ -3045,11 +3045,11 @@ function test_setAmps()
         
         for ind =0:2^numQubits-1
             if ind < start_ind
-                @test QuEST.getAmp(qureg1, ind) ≈ state[ind+1]
+                @test QuEST.getAmp(qureg1, ind) ≈ state[ind+1] atol = tolerance
             elseif ind <= finish_ind
-                @test QuEST.getAmp(qureg1, ind) ≈ new_amps[ind - start_ind+1]
+                @test QuEST.getAmp(qureg1, ind) ≈ new_amps[ind - start_ind+1] atol = tolerance
             else
-                @test QuEST.getAmp(qureg1, ind) ≈ state[ind+1]
+                @test QuEST.getAmp(qureg1, ind) ≈ state[ind+1] atol = tolerance
             end
         end
         QuEST.destroyQureg(qureg1, env)
@@ -3090,7 +3090,7 @@ function test_setWeightedQureg()
             rhs  = fac1 * state1[ind+1]
             rhs += fac2 * state2[ind+1]
             rhs += fac3 * state3[ind+1]    
-            @test QuEST.getAmp(qureg3, ind) ≈ rhs
+            @test QuEST.getAmp(qureg3, ind) ≈ rhs atol = tolerance
         end
         
         QuEST.destroyQureg(qureg1, env)
@@ -3285,8 +3285,8 @@ function test_initDebugState()
         reals = unsafe_wrap(Vector{qreal}, qureg.stateVec.real, 2^numQubits)
         imags = unsafe_wrap(Vector{qreal}, qureg.stateVec.imag, 2^numQubits)
         for i=0:2^numQubits-1
-            @test reals[i+1] ≈ 2i/10
-            @test imags[i+1] ≈ (2i+1)/10
+            @test reals[i+1] ≈ 2i/10 atol = tolerance
+            @test imags[i+1] ≈ (2i+1)/10 atol = tolerance
         end
 
     end
@@ -3432,8 +3432,8 @@ function test_reportState()
         for l =1:2^numQubits
             this_re = parse(qreal, split(lines[l+2], " ")[1][1:end-1])
             this_im = parse(qreal, split(lines[l+2], " ")[2])
-            @test this_im ≈ imag(state[l])
-            @test this_re ≈ real(state[l])
+            @test this_im ≈ imag(state[l]) atol = tolerance
+            @test this_re ≈ real(state[l]) atol = tolerance
         end
 
         QuEST.reportState(qureg)
@@ -3446,8 +3446,8 @@ function test_reportState()
             this_line = readline(io)
             this_re = parse(qreal, split(this_line, " ")[1][1:end-1])
             this_im = parse(qreal, split(this_line, " ")[2])
-            @test this_im ≈ imag(state[l])
-            @test this_re ≈ real(state[l])
+            @test this_im ≈ imag(state[l]) atol = tolerance
+            @test this_re ≈ real(state[l]) atol = tolerance
         end
 
         @test readline(io) == ""
