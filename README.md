@@ -15,8 +15,8 @@ Because of that, some shit is necessary to make stuff work.  Contributors are we
 
 ##### Here's what you have to do:
 *Don't* do `pkg> add` QuEST_jl. Instead do the following two steps in this order:
-1. `(@v1.6) pkg> add https://github.com/TartuQC/Clang.jl`
-2. `(@v1.6) pkg> add https://github.com/TartuQC/QuEST_jl.git`
+1. `(@v1.6) pkg> add https://github.com/fieldofnodes/QuEST_jl`
+2. `(@v1.6) pkg> add https://github.com/fieldofnodes/QuEST_jl.git`
 
 ## Installation
 
